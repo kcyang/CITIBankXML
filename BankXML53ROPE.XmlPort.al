@@ -1,4 +1,4 @@
-xmlport 55110 BankXML_57OPE
+xmlport 58150 BankXML_53_ROPE
 {
     Direction = Export;
     Encoding = UTF8;
@@ -23,7 +23,7 @@ xmlport 55110 BankXML_57OPE
                         begin
 
 
-                            MsgId := 'GUERBET.NC4.' + FORMAT(TODAY, 0, '<Year4><Month,2><Day,2>') + '.' + FORMAT(TIME, 0, '<Hours24><Minutes,2><Seconds,2>') + '.57OPE';
+                            MsgId := 'GUERBET.NC4.JP1' + FORMAT(TODAY, 0, '<Year,2><Month,2><Day,2>') + '.' + FORMAT(TIME, 0, '<Hours24><Minutes,2><Seconds,2>') + '.53_ROPE';
                             /*
                             IF STRLEN(Msgid) > 35 THEN BEGIN
                             
@@ -72,12 +72,12 @@ xmlport 55110 BankXML_57OPE
 
                             trigger OnBeforePassVariable()
                             begin
-                                Nm := 'GUERBET TAIWAN CO LTD'
+                                Nm := 'GUERBET JAPAN KK'
                             end;
                         }
                     }
                 }
-                tableelement(Table81; Table81)
+                tableelement("Gen. Journal Line"; "Gen. Journal Line")
                 {
                     XmlName = 'PmtInf';
                     textelement(PmtInfId)
@@ -101,7 +101,6 @@ xmlport 55110 BankXML_57OPE
 
                         trigger OnBeforePassVariable()
                         begin
-                            //"<ReqdExctnDt>" := FORMAT("Gen. Journal Line"."Posting Date",0,9);
                             ReqdExctnDt := FORMAT("Gen. Journal Line"."Posting Date", 0, 9);
                         end;
                     }
@@ -113,7 +112,7 @@ xmlport 55110 BankXML_57OPE
 
                             trigger OnBeforePassVariable()
                             begin
-                                "<Nm2>" := 'GUERBET TAIWAN CO LTD';
+                                "<Nm2>" := 'GUERBET JAPAN KK';
                             end;
                         }
                     }
@@ -150,7 +149,7 @@ xmlport 55110 BankXML_57OPE
 
                                 trigger OnBeforePassVariable()
                                 begin
-                                    BIC := 'CITITWTX';
+                                    BIC := 'CITIJPJT';
                                 end;
                             }
                             textelement(PstlAdr)
@@ -160,7 +159,7 @@ xmlport 55110 BankXML_57OPE
 
                                     trigger OnBeforePassVariable()
                                     begin
-                                        Ctry := 'TW';
+                                        Ctry := 'JP';
                                     end;
                                 }
                             }
@@ -188,7 +187,7 @@ xmlport 55110 BankXML_57OPE
 
                                     trigger OnBeforePassVariable()
                                     begin
-                                        Ccy := 'TWD';
+                                        Ccy := 'JPY';
                                     end;
                                 }
 
@@ -247,7 +246,6 @@ xmlport 55110 BankXML_57OPE
                                                 GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount."Vendor No.", "Gen. Journal Line"."Account No.");
                                                 IF GVRE_VendorBankAccount.FINDSET THEN BEGIN
                                                     "<MmbId>" := GVRE_VendorBankAccount."Bank Branch No.";
-                                                    //MESSAGE(GVRE_VendorBankAccount."Bank Account No.");
                                                 END ELSE BEGIN
                                                     MESSAGE(Text0001, "Gen. Journal Line"."Account No.", 'Bank Branch No.');
                                                     ERROR('Bank Branch No.');
@@ -286,7 +284,6 @@ xmlport 55110 BankXML_57OPE
                                         begin
                                             IF GVRE_VendorBankAccount.FINDSET THEN BEGIN
                                                 "<Id4>" := GVRE_VendorBankAccount."Bank Account No.";
-                                                //MESSAGE(GVRE_VendorBankAccount."Bank Account No.");
                                             END ELSE BEGIN
                                                 MESSAGE(Text0001, GVRE_VendorBankAccount."Vendor No.", 'Bank Account No.');
                                                 ERROR('Bank Account No.');
@@ -298,20 +295,6 @@ xmlport 55110 BankXML_57OPE
                         }
                     }
                 }
-
-                trigger OnBeforePassVariable()
-                begin
-                    /*
-                    currXMLport.FILENAME := 'GUERBET.NC4.IMPORT_ACK.' + FORMAT(TODAY,0,'<Year4><Month,2><Day,2>')+ '57' +
-                    '.PY_BULK.' +'57OPE'+ '.null.null.xml';
-                    */
-                    /*
-                    GVRE_XMLInterfaceLog.INIT;
-                    GVRE_XMLInterfaceLog."XML Name" := currXMLport.FILENAME;
-                    GVRE_XMLInterfaceLog."Extract Date" := WORKDATE;
-                    */
-
-                end;
             }
         }
     }
@@ -330,8 +313,8 @@ xmlport 55110 BankXML_57OPE
 
     trigger OnInitXmlPort()
     begin
-        "Gen. Journal Line".SETRANGE("Gen. Journal Line"."Journal Template Name", 'PAYMENT');
-        "Gen. Journal Line".SETRANGE("Gen. Journal Line".Comment, '57OPE');
+        "Gen. Journal Line".SETRANGE("Gen. Journal Line"."Journal Template Name", 'PAYMENTS');
+        "Gen. Journal Line".SETRANGE("Gen. Journal Line".Comment, '53_ROPE');
         "Gen. Journal Line".SETRANGE("Gen. Journal Line"."Journal Batch Name", 'CITI');
     end;
 
@@ -346,9 +329,5 @@ xmlport 55110 BankXML_57OPE
         Text0001: Label '%1 ''s bank %2 doesn''t exist.';
         Text0002: Label '%1 ''s bank account no. doesn''t exist.';
         GVIN_CtrlSum: Integer;
-        TA_Test: Text;
-        GVTX_Hours: Text;
-        GVTX_Minutes: Text;
-        GVTX_Seconds: Text;
 }
 

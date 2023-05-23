@@ -1,4 +1,4 @@
-xmlport 55111 BankXML_57OPT
+xmlport 58160 BankXML_53_ROPT
 {
     Direction = Export;
     Encoding = UTF8;
@@ -20,17 +20,7 @@ xmlport 55111 BankXML_57OPT
 
                         trigger OnBeforePassVariable()
                         begin
-
-
-                            MsgId := 'GUERBET.NC4.' + FORMAT(TODAY, 0, '<Year4><Month,2><Day,2>') + '.' + FORMAT(TIME, 0, '<Hours24><Minutes,2><Seconds,2>') + '.57OPT';
-
-
-                            /*
-                            IF STRLEN(Msgid) > 35 THEN BEGIN
-                            
-                            END;
-                            */
-
+                            MsgId := 'GUERBET.NC4.JP1' + FORMAT(TODAY, 0, '<Year,2><Month,2><Day,2>') + '.' + FORMAT(TIME, 0, '<Hours24><Minutes,2><Seconds,2>') + '.53_ROPT';
                         end;
                     }
                     textelement(CreDtTm)
@@ -45,7 +35,6 @@ xmlport 55111 BankXML_57OPT
                     }
                     textelement(NbOfTxs)
                     {
-
                         trigger OnBeforePassVariable()
                         begin
                             NbOfTxs := FORMAT("Gen. Journal Line".COUNT);
@@ -58,17 +47,16 @@ xmlport 55111 BankXML_57OPT
 
                             trigger OnBeforePassVariable()
                             begin
-                                Nm := 'GUERBET TAIWAN CO LTD'
+                                Nm := 'GUERBET JAPAN KK'
                             end;
                         }
                     }
                 }
-                tableelement(Table81; Table81)
+                tableelement("Gen. Journal Line"; "Gen. Journal Line")
                 {
                     XmlName = 'PmtInf';
                     textelement(PmtInfId)
                     {
-
                         trigger OnBeforePassVariable()
                         begin
                             PmtInfId := FORMAT("Gen. Journal Line"."Document No.") + '.' + FORMAT("Gen. Journal Line"."Line No.");
@@ -76,7 +64,6 @@ xmlport 55111 BankXML_57OPT
                     }
                     textelement(PmtMtd)
                     {
-
                         trigger OnBeforePassVariable()
                         begin
                             PmtMtd := 'TRF';
@@ -88,7 +75,6 @@ xmlport 55111 BankXML_57OPT
                         {
                             textelement(Cd)
                             {
-
                                 trigger OnBeforePassVariable()
                                 begin
                                     Cd := 'URGP';
@@ -98,7 +84,6 @@ xmlport 55111 BankXML_57OPT
                     }
                     textelement(ReqdExctnDt)
                     {
-
                         trigger OnBeforePassVariable()
                         begin
                             ReqdExctnDt := FORMAT("Gen. Journal Line"."Posting Date", 0, 9);
@@ -112,7 +97,7 @@ xmlport 55111 BankXML_57OPT
 
                             trigger OnBeforePassVariable()
                             begin
-                                "<Nm2>" := 'GUERBET TAIWAN CO LTD';
+                                "<Nm2>" := 'GUERBET JAPAN KK';
                             end;
                         }
                     }
@@ -150,7 +135,7 @@ xmlport 55111 BankXML_57OPT
 
                                 trigger OnBeforePassVariable()
                                 begin
-                                    BIC := 'CITITWTX';
+                                    BIC := 'CITIJPJT';
                                 end;
                             }
                             textelement(PstlAdr)
@@ -160,7 +145,7 @@ xmlport 55111 BankXML_57OPT
 
                                     trigger OnBeforePassVariable()
                                     begin
-                                        Ctry := 'TW';
+                                        Ctry := 'JP';
                                     end;
                                 }
                             }
@@ -189,7 +174,7 @@ xmlport 55111 BankXML_57OPT
                                     trigger OnBeforePassVariable()
                                     begin
                                         IF "Gen. Journal Line"."Currency Code" = '' THEN BEGIN
-                                            Ccy := 'TWD';
+                                            Ccy := 'JPY';
                                         END ELSE
                                             IF "Gen. Journal Line"."Currency Code" <> '' THEN BEGIN
                                                 Ccy := "Gen. Journal Line"."Currency Code";
@@ -219,23 +204,9 @@ xmlport 55111 BankXML_57OPT
                                             GVRE_VendorBankAccount.RESET;
                                             GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount.Code, "Gen. Journal Line"."Recipient Bank Account");
                                             GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount."Vendor No.", "Gen. Journal Line"."Account No.");
-                                            /*
-                                            GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount."SWIFT Code",'<>%1','');
                                             IF GVRE_VendorBankAccount.FINDSET THEN BEGIN
-                                              "<BIC2>" := GVRE_VendorBankAccount."SWIFT Code";
-                                              //MESSAGE(GVRE_VendorBankAccount."Bank Account No.");
-
-                                            END ELSE BEGIN
-                                              MESSAGE(Text0001, "Gen. Journal Line"."Account No.", 'SWIFT code' );
-                                            END;
-                                          END;
-                                          */
-                                            IF GVRE_VendorBankAccount.FINDSET THEN BEGIN
-                                                //MESSAGE(GVRE_VendorBankAccount."SWIFT Code");
                                                 IF GVRE_VendorBankAccount."SWIFT Code" <> '' THEN BEGIN
                                                     "<BIC2>" := GVRE_VendorBankAccount."SWIFT Code";
-                                                    //MESSAGE(GVRE_VendorBankAccount."Bank Account No.");
-
                                                 END ELSE BEGIN
                                                     MESSAGE(Text0001, "Gen. Journal Line"."Account No.", 'SWIFT code');
                                                     ERROR('SWIFT code');
@@ -254,26 +225,12 @@ xmlport 55111 BankXML_57OPT
 
                                         trigger OnBeforePassVariable()
                                         begin
-                                            /*
-                                            IF "Gen. Journal Line"."Account Type" = "Gen. Journal Line"."Account Type"::Vendor THEN BEGIN
-                                            
-                                              GVRE_VendorBankAccount.RESET;
-                                              GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount.Code, "Gen. Journal Line"."Recipient Bank Account");
-                                              GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount."Vendor No.", "Gen. Journal Line"."Account No.");
-                                            
-                                              GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount."Country/Region Code",'<>%1','');
-                                              IF GVRE_VendorBankAccount.FINDSET THEN BEGIN
-                                              */
                                             IF GVRE_VendorBankAccount."Country/Region Code" <> '' THEN BEGIN
                                                 "<Ctry2>" := GVRE_VendorBankAccount."Country/Region Code";
-                                                //MESSAGE(GVRE_VendorBankAccount."Bank Account No.");
                                             END ELSE BEGIN
                                                 MESSAGE(Text0001, "Gen. Journal Line"."Account No.", 'Country/Region Code');
                                                 ERROR('Country/Region Code');
-
                                             END;
-                                            //END;
-
                                         end;
                                     }
                                 }
@@ -312,24 +269,12 @@ xmlport 55111 BankXML_57OPT
                                         trigger OnBeforePassVariable()
                                         begin
                                             //credit account no.
-                                            /*
-                                            IF "Gen. Journal Line"."Account Type" = "Gen. Journal Line"."Account Type"::Vendor THEN BEGIN
-                                            
-                                              GVRE_VendorBankAccount.RESET;
-                                              GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount.Code, "Gen. Journal Line"."Recipient Bank Account");
-                                              GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount."Vendor No.", "Gen. Journal Line"."Account No.");
-                                              GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount."Bank Account No.",'<>%1','');
-                                              */
                                             IF GVRE_VendorBankAccount."Bank Account No." <> '' THEN BEGIN
                                                 "<Id4>" := GVRE_VendorBankAccount."Bank Account No.";
-                                                //MESSAGE(GVRE_VendorBankAccount."Bank Account No.");
                                             END ELSE BEGIN
                                                 MESSAGE(Text0001, "Gen. Journal Line"."Account No.", 'Bank Account No.');
                                                 ERROR('Bank Account No.');
                                             END;
-                                            //END;
-
-
                                         end;
                                     }
                                 }
@@ -370,8 +315,8 @@ xmlport 55111 BankXML_57OPT
 
     trigger OnInitXmlPort()
     begin
-        "Gen. Journal Line".SETRANGE("Gen. Journal Line"."Journal Template Name", 'PAYMENT');
-        "Gen. Journal Line".SETRANGE("Gen. Journal Line".Comment, '57OPT');
+        "Gen. Journal Line".SETRANGE("Gen. Journal Line"."Journal Template Name", 'PAYMENTS');
+        "Gen. Journal Line".SETRANGE("Gen. Journal Line".Comment, '53_ROPT');
         "Gen. Journal Line".SETRANGE("Gen. Journal Line"."Journal Batch Name", 'CITI');
     end;
 

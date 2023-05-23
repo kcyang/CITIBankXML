@@ -1,5 +1,16 @@
 pageextension 58150 PaymentJournalExt extends "Payment Journal"
 {
+    layout
+    {
+        addfirst(Control1)
+        {
+            field("XML Export Completion"; Rec."XML Export Completion")
+            {
+                Editable = false;
+                ApplicationArea = All;
+            }
+        }
+    }
     actions
     {
         addlast("F&unctions")
@@ -13,19 +24,17 @@ pageextension 58150 PaymentJournalExt extends "Payment Journal"
                 ApplicationArea = All;
                 trigger OnAction()
                 begin
-                    IF COMPANYNAME = 'Guerbet Taiwan PRD' THEN BEGIN
+                    IF COMPANYNAME = 'Guerbet Japan KK' THEN BEGIN
 
                         GVRE_GenJournalLine.RESET;
-                        //GVRE_GenJournalLine.SETRANGE(GVRE_GenJournalLine."XML Export Completion", FALSE);
-                        GVRE_GenJournalLine.SETRANGE(GVRE_GenJournalLine."Journal Template Name", 'PAYMENT');
+                        GVRE_GenJournalLine.SETRANGE(GVRE_GenJournalLine."Journal Template Name", 'PAYMENTS');
                         GVRE_GenJournalLine.SETRANGE(GVRE_GenJournalLine."Journal Batch Name", 'CITI');
-                        GVRE_GenJournalLine.SETFILTER(GVRE_GenJournalLine.Comment, '%1', '<>57OPE');
+                        GVRE_GenJournalLine.SETFILTER(GVRE_GenJournalLine.Comment, '%1', '<>53_ROPE');
                         IF GVRE_GenJournalLine.FIND('-') THEN BEGIN
-                            GVRE_GenJournalLine.SETFILTER(GVRE_GenJournalLine.Comment, '%1', '<>57OPT');
+                            GVRE_GenJournalLine.SETFILTER(GVRE_GenJournalLine.Comment, '%1', '<>53_ROPT');
                             IF GVRE_GenJournalLine.FIND('-') THEN BEGIN
                                 ERROR('There are empty or wrong values in comment fields. Please check the comment field in CITI batch');
                             END;
-                            //GVRE_GenJournalLine.RESET;
                         END;
 
                         GVTX_Options := 'OPEX, International OPEX';
@@ -46,7 +55,7 @@ pageextension 58150 PaymentJournalExt extends "Payment Journal"
                 ApplicationArea = All;
                 trigger OnAction()
                 begin
-                    IF (Rec."Journal Template Name" = 'PAYMENT') AND ("Journal Batch Name" = 'CITI') THEN BEGIN
+                    IF (Rec."Journal Template Name" = 'PAYMENTS') AND (Rec."Journal Batch Name" = 'CITI') THEN BEGIN
                         GVTX_Options := 'OPEX, International OPEX, Check';
                         GVTX_OptionsMessage := 'Choose one of the following options to uncheck';
                         GVIN_OptionNumber := DIALOG.STRMENU(GVTX_Options, 1, GVTX_OptionsMessage);
@@ -57,11 +66,9 @@ pageextension 58150 PaymentJournalExt extends "Payment Journal"
                         END ELSE BEGIN
                             GVRE_GenJournalLine.RESET;
                             CurrPage.SETSELECTIONFILTER(GVRE_GenJournalLine);
-                            //CurrPage."Document No.".GETRECORD(GVRE_GenJournalLine);
                             IF GVRE_GenJournalLine.FIND('-') THEN BEGIN
                                 REPEAT
-                                    IF (GVRE_GenJournalLine.Comment <> '57OPE') AND (GVRE_GenJournalLine.Comment <> '57OPT') THEN BEGIN
-                                        //MESSAGE('%1',GVRE_GenJournalLine."Line No.");
+                                    IF (GVRE_GenJournalLine.Comment <> '53_ROPE') AND (GVRE_GenJournalLine.Comment <> '53_ROPT') THEN BEGIN
                                         GVRE_GenJournalLine."XML Export Completion" := TRUE;
                                         GVRE_GenJournalLine.MODIFY;
                                     END;
@@ -74,6 +81,7 @@ pageextension 58150 PaymentJournalExt extends "Payment Journal"
             }
         }
     }
+
 
     var
         GVCU_BankXML: Codeunit BankXML;

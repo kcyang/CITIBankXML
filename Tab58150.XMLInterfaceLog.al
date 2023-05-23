@@ -1,4 +1,4 @@
-table 55100 "XML Interface Log"
+table 58150 "XML Interface Log"
 {
     Caption = 'XML Interface Log';
     DataClassification = ToBeClassified;
