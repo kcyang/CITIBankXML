@@ -1,0 +1,45 @@
+{
+  "id": "33542dbe-9686-4c52-8bff-3e20d8f3f4e0",
+  "name": "CITIBankXML",
+  "publisher": "2H Consulting",
+  "version": "1.0.0.0",
+  "brief": "",
+  "description": "",
+  "privacyStatement": "",
+  "EULA": "",
+  "help": "",
+  "url": "",
+  "logo": "",
+  "dependencies": [
+    {
+      "id": "7666d280-5674-471d-94b7-df882b42f358",
+      "name": "GJTableCore",
+      "publisher": "2H Consulting",
+      "version": "1.0.0.1"  
+    },
+    {
+      "id": "1db53bc6-92d3-4d99-943e-45efd64f04dc",
+      "name": "Guerbet Japan Custom",
+      "publisher": "2H Consulting",
+      "version": "1.0.0.12"
+    }
+  ],
+  "screenshots": [],
+  "platform": "1.0.0.0",
+  "application": "21.0.0.0",
+  "idRanges": [
+    {
+      "from": 58150,
+      "to": 58199
+    }
+  ],
+  "resourceExposurePolicy": {
+    "allowDebugging": true,
+    "allowDownloadingSource": true,
+    "includeSourceInSymbolFile": true
+  },
+  "runtime": "10.0",
+  "features": [
+    "NoImplicitWith"
+  ]
+}
