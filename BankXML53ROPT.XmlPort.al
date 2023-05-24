@@ -245,11 +245,14 @@ xmlport 58160 BankXML_53_ROPT
                                 trigger OnBeforePassVariable()
                                 begin
                                     CLEAR(GVTX_VendorName);
-                                    GVRE_Vendor.RESET;
-                                    GVRE_Vendor.SETRANGE(GVRE_Vendor."No.", "Gen. Journal Line"."Account No.");
-                                    IF GVRE_Vendor.FIND('-') THEN BEGIN
-                                        GVTX_VendorName := GVRE_Vendor.Name;
-                                    END;
+                                    // GVRE_Vendor.RESET;
+                                    // GVRE_Vendor.SETRANGE(GVRE_Vendor."No.", "Gen. Journal Line"."Account No.");
+                                    // IF GVRE_Vendor.FIND('-') THEN BEGIN
+                                    //     GVTX_VendorName := GVRE_Vendor.Name;
+                                    // END;
+                                    IF GVRE_VendorBankAccount.FindSet() then begin
+                                        GVTX_VendorName := GVRE_VendorBankAccount.Name;
+                                    end;
                                     "<Nm3>" := GVTX_VendorName;
                                 end;
                             }

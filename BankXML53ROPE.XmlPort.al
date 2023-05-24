@@ -96,6 +96,19 @@ xmlport 58150 BankXML_53_ROPE
                             PmtMtd := 'TRF';
                         end;
                     }
+                    textelement(PmtTpInf)
+                    {
+                        textelement(SvcLvl)
+                        {
+                            textelement(Cd)
+                            {
+                                trigger OnBeforePassVariable()
+                                begin
+                                    Cd := 'NURG';
+                                end;
+                            }
+                        }
+                    }
                     textelement(ReqdExctnDt)
                     {
 
@@ -208,11 +221,21 @@ xmlport 58150 BankXML_53_ROPE
                                     trigger OnBeforePassVariable()
                                     begin
                                         CLEAR(GVTX_VendorName);
-                                        GVRE_Vendor.RESET;
-                                        GVRE_Vendor.SETRANGE(GVRE_Vendor."No.", "Gen. Journal Line"."Account No.");
-                                        IF GVRE_Vendor.FIND('-') THEN BEGIN
-                                            GVTX_VendorName := GVRE_Vendor.Name;
+                                        IF "Gen. Journal Line"."Account Type" = "Gen. Journal Line"."Account Type"::Vendor THEN BEGIN
+                                            GVRE_VendorBankAccount.RESET;
+                                            GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount.Code, "Gen. Journal Line"."Recipient Bank Account");
+                                            GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount."Vendor No.", "Gen. Journal Line"."Account No.");
+                                            IF GVRE_VendorBankAccount.FINDSET THEN BEGIN
+                                                GVTX_VendorName := GVRE_VendorBankAccount.Name;
+                                            END;
                                         END;
+                                        /*                                        
+                                                                                GVRE_Vendor.RESET;
+                                                                                GVRE_Vendor.SETRANGE(GVRE_Vendor."No.", "Gen. Journal Line"."Account No.");
+                                                                                IF GVRE_Vendor.FIND('-') THEN BEGIN
+                                                                                    GVTX_VendorName := GVRE_Vendor.Name;
+                                                                                END;
+                                        */
                                         "<Nm4>" := GVTX_VendorName;
                                     end;
                                 }
@@ -239,17 +262,22 @@ xmlport 58150 BankXML_53_ROPE
 
                                         trigger OnBeforePassVariable()
                                         begin
-                                            IF "Gen. Journal Line"."Account Type" = "Gen. Journal Line"."Account Type"::Vendor THEN BEGIN
-
-                                                GVRE_VendorBankAccount.RESET;
-                                                GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount.Code, "Gen. Journal Line"."Recipient Bank Account");
-                                                GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount."Vendor No.", "Gen. Journal Line"."Account No.");
-                                                IF GVRE_VendorBankAccount.FINDSET THEN BEGIN
-                                                    "<MmbId>" := GVRE_VendorBankAccount."Bank Branch No.";
-                                                END ELSE BEGIN
-                                                    MESSAGE(Text0001, "Gen. Journal Line"."Account No.", 'Bank Branch No.');
-                                                    ERROR('Bank Branch No.');
-                                                END;
+                                            // IF "Gen. Journal Line"."Account Type" = "Gen. Journal Line"."Account Type"::Vendor THEN BEGIN
+                                            //     GVRE_VendorBankAccount.RESET;
+                                            //     GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount.Code, "Gen. Journal Line"."Recipient Bank Account");
+                                            //     GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount."Vendor No.", "Gen. Journal Line"."Account No.");
+                                            //     IF GVRE_VendorBankAccount.FINDSET THEN BEGIN
+                                            //         "<MmbId>" := GVRE_VendorBankAccount."Bank Branch No.";
+                                            //     END ELSE BEGIN
+                                            //         MESSAGE(Text0001, "Gen. Journal Line"."Account No.", 'Bank Branch No.');
+                                            //         ERROR('Bank Branch No.');
+                                            //     END;
+                                            // END;
+                                            IF GVRE_VendorBankAccount.FINDSET THEN BEGIN
+                                                "<MmbId>" := GVRE_VendorBankAccount."Bank Branch No.";
+                                            END ELSE BEGIN
+                                                MESSAGE(Text0001, "Gen. Journal Line"."Account No.", 'Bank Branch No.');
+                                                ERROR('Bank Branch No.');
                                             END;
                                         end;
                                     }

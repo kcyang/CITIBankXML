@@ -11,7 +11,7 @@ table 58150 "XML Interface Log"
             AutoIncrement = true;
             DataClassification = ToBeClassified;
         }
-        field(2; "XML Name"; Text[65])
+        field(2; "XML Name"; Text[100])
         {
             Caption = 'XML Name';
             DataClassification = ToBeClassified;
@@ -21,7 +21,7 @@ table 58150 "XML Interface Log"
             Caption = 'Extract Date';
             DataClassification = ToBeClassified;
         }
-        field(4; Path; Text[30])
+        field(4; Path; Text[100])
         {
             Caption = 'Path';
             DataClassification = ToBeClassified;
