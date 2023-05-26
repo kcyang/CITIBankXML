@@ -21,23 +21,13 @@ xmlport 58150 BankXML_53_ROPE
 
                         trigger OnBeforePassVariable()
                         begin
-
-
                             MsgId := 'GUERBET.NC4.JP1' + FORMAT(TODAY, 0, '<Year,2><Month,2><Day,2>') + '.' + FORMAT(TIME, 0, '<Hours24><Minutes,2><Seconds,2>') + '.53_ROPE';
-                            /*
-                            IF STRLEN(Msgid) > 35 THEN BEGIN
-                            
-                            END;
-                            */
-
                         end;
                     }
                     textelement(CreDtTm)
                     {
-
                         trigger OnBeforePassVariable()
                         begin
-
                             CreDtTm := FORMAT(DT2DATE(CURRENTDATETIME), 0, 9) + 'T'
                             + CONVERTSTR(FORMAT(DT2TIME(CURRENTDATETIME), 0, '<hours24,2>:<Minutes,2>:<Seconds,2>'), ' ', '0')
                             + '.111';
@@ -45,16 +35,13 @@ xmlport 58150 BankXML_53_ROPE
                     }
                     textelement(NbOfTxs)
                     {
-
                         trigger OnBeforePassVariable()
                         begin
-
                             NbOfTxs := FORMAT("Gen. Journal Line".COUNT);
                         end;
                     }
                     textelement(CtrlSum)
                     {
-
                         trigger OnBeforePassVariable()
                         begin
                             IF "Gen. Journal Line".FIND('-') THEN BEGIN
@@ -69,7 +56,6 @@ xmlport 58150 BankXML_53_ROPE
                     {
                         textelement(Nm)
                         {
-
                             trigger OnBeforePassVariable()
                             begin
                                 Nm := 'GUERBET JAPAN KK'
@@ -82,7 +68,6 @@ xmlport 58150 BankXML_53_ROPE
                     XmlName = 'PmtInf';
                     textelement(PmtInfId)
                     {
-
                         trigger OnBeforePassVariable()
                         begin
                             PmtInfId := FORMAT("Gen. Journal Line"."Document No.") + '.' + FORMAT("Gen. Journal Line"."Line No.");
@@ -90,7 +75,6 @@ xmlport 58150 BankXML_53_ROPE
                     }
                     textelement(PmtMtd)
                     {
-
                         trigger OnBeforePassVariable()
                         begin
                             PmtMtd := 'TRF';
@@ -111,7 +95,6 @@ xmlport 58150 BankXML_53_ROPE
                     }
                     textelement(ReqdExctnDt)
                     {
-
                         trigger OnBeforePassVariable()
                         begin
                             ReqdExctnDt := FORMAT("Gen. Journal Line"."Posting Date", 0, 9);
@@ -142,11 +125,11 @@ xmlport 58150 BankXML_53_ROPE
                                     trigger OnBeforePassVariable()
                                     begin
                                         GVRE_BankAccount.RESET;
-                                        GVRE_BankAccount.SETFILTER(GVRE_BankAccount."No.", 'B05');
+                                        GVRE_BankAccount.SETFILTER(GVRE_BankAccount."No.", 'B001');
                                         IF GVRE_BankAccount.FINDSET THEN BEGIN
                                             "<Id2>" := GVRE_BankAccount."Bank Account No.";
                                         END;
-                                        //bank account b05
+                                        //bank account B001
                                     end;
                                 }
                             }
@@ -210,6 +193,7 @@ xmlport 58150 BankXML_53_ROPE
                                 end;
                             }
                         }
+                        /*
                         textelement(ChqInstr)
                         {
                             textelement(DlvrTo)
@@ -229,13 +213,6 @@ xmlport 58150 BankXML_53_ROPE
                                                 GVTX_VendorName := GVRE_VendorBankAccount.Name;
                                             END;
                                         END;
-                                        /*                                        
-                                                                                GVRE_Vendor.RESET;
-                                                                                GVRE_Vendor.SETRANGE(GVRE_Vendor."No.", "Gen. Journal Line"."Account No.");
-                                                                                IF GVRE_Vendor.FIND('-') THEN BEGIN
-                                                                                    GVTX_VendorName := GVRE_Vendor.Name;
-                                                                                END;
-                                        */
                                         "<Nm4>" := GVTX_VendorName;
                                     end;
                                 }
@@ -249,6 +226,7 @@ xmlport 58150 BankXML_53_ROPE
                                 }
                             }
                         }
+                        */
                         textelement(CdtrAgt)
                         {
                             textelement("<fininstnid2>")
@@ -261,24 +239,31 @@ xmlport 58150 BankXML_53_ROPE
                                         XmlName = 'MmbId';
 
                                         trigger OnBeforePassVariable()
+                                        var
+                                            LV_BankBranchNo: Text;
                                         begin
-                                            // IF "Gen. Journal Line"."Account Type" = "Gen. Journal Line"."Account Type"::Vendor THEN BEGIN
-                                            //     GVRE_VendorBankAccount.RESET;
-                                            //     GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount.Code, "Gen. Journal Line"."Recipient Bank Account");
-                                            //     GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount."Vendor No.", "Gen. Journal Line"."Account No.");
-                                            //     IF GVRE_VendorBankAccount.FINDSET THEN BEGIN
-                                            //         "<MmbId>" := GVRE_VendorBankAccount."Bank Branch No.";
-                                            //     END ELSE BEGIN
-                                            //         MESSAGE(Text0001, "Gen. Journal Line"."Account No.", 'Bank Branch No.');
-                                            //         ERROR('Bank Branch No.');
-                                            //     END;
-                                            // END;
-                                            IF GVRE_VendorBankAccount.FINDSET THEN BEGIN
-                                                "<MmbId>" := GVRE_VendorBankAccount."Bank Branch No.";
-                                            END ELSE BEGIN
-                                                MESSAGE(Text0001, "Gen. Journal Line"."Account No.", 'Bank Branch No.');
-                                                ERROR('Bank Branch No.');
+                                            CLEAR(GVTX_VendorName);
+                                            Clear(LV_BankBranchNo);
+                                            IF "Gen. Journal Line"."Account Type" = "Gen. Journal Line"."Account Type"::Vendor THEN BEGIN
+                                                GVRE_VendorBankAccount.RESET;
+                                                GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount.Code, "Gen. Journal Line"."Recipient Bank Account");
+                                                GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount."Vendor No.", "Gen. Journal Line"."Account No.");
+                                                IF GVRE_VendorBankAccount.FINDSET THEN BEGIN
+                                                    GVTX_VendorName := GVRE_VendorBankAccount.Name;
+                                                    LV_BankBranchNo := GVRE_VendorBankAccount."Bank Branch No.";
+                                                    PadZeroToFront(LV_BankBranchNo);
+                                                    "<MmbId>" := LV_BankBranchNo;
+                                                END ELSE BEGIN
+                                                    MESSAGE(Text0001, "Gen. Journal Line"."Account No.", 'Bank Branch No.');
+                                                    ERROR('Bank Branch No.');
+                                                END;
                                             END;
+                                            // IF GVRE_VendorBankAccount.FINDSET THEN BEGIN
+                                            //     "<MmbId>" := GVRE_VendorBankAccount."Bank Branch No.";
+                                            // END ELSE BEGIN
+                                            //     MESSAGE(Text0001, "Gen. Journal Line"."Account No.", 'Bank Branch No.');
+                                            //     ERROR('Bank Branch No.');
+                                            // END;
                                         end;
                                     }
                                 }
@@ -345,6 +330,15 @@ xmlport 58150 BankXML_53_ROPE
         "Gen. Journal Line".SETRANGE("Gen. Journal Line".Comment, '53_ROPE');
         "Gen. Journal Line".SETRANGE("Gen. Journal Line"."Journal Batch Name", 'CITI');
     end;
+
+    procedure PadZeroToFront(var InText: Text)
+    var
+        PaddedText: Text[7];
+    begin
+        PaddedText := StrSubstNo('%1%2', PadStr('', 7 - StrLen(InText), '0'), InText);
+        InText := PaddedText;
+    end;
+
 
     var
         GVRE_Vendor: Record "Vendor";
