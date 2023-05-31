@@ -92,6 +92,18 @@ xmlport 58150 BankXML_53_ROPE
                                 end;
                             }
                         }
+                        textelement(LclInstrm)
+                        {
+                            textelement(LclInstrmCd)
+                            {
+                                XmlName = 'Cd';
+
+                                trigger OnBeforePassVariable()
+                                begin
+                                    LclInstrmCd := 'CITI410';
+                                end;
+                            }
+                        }
                     }
                     textelement(ReqdExctnDt)
                     {
@@ -258,12 +270,6 @@ xmlport 58150 BankXML_53_ROPE
                                                     ERROR('Bank Branch No.');
                                                 END;
                                             END;
-                                            // IF GVRE_VendorBankAccount.FINDSET THEN BEGIN
-                                            //     "<MmbId>" := GVRE_VendorBankAccount."Bank Branch No.";
-                                            // END ELSE BEGIN
-                                            //     MESSAGE(Text0001, "Gen. Journal Line"."Account No.", 'Bank Branch No.');
-                                            //     ERROR('Bank Branch No.');
-                                            // END;
                                         end;
                                     }
                                 }
@@ -305,6 +311,45 @@ xmlport 58150 BankXML_53_ROPE
                                     }
                                 }
                             }
+
+                            textelement(Tp)
+                            {
+                                textelement(Prtry)
+                                {
+                                    trigger OnBeforePassVariable()
+                                    var
+                                        BankAccountType: Enum "Bank Account Type";
+                                    begin
+                                        IF GVRE_VendorBankAccount.FindSet() THEN begin
+                                            Case GVRE_VendorBankAccount."Bank Account Type" of
+                                                BankAccountType::" ":
+                                                    Prtry := 'SO';
+                                                BankAccountType::FUTSUU:
+                                                    Prtry := 'FU';
+                                                BankAccountType::SONOTA:
+                                                    Prtry := 'SO';
+                                                BankAccountType::CHOCHIKU:
+                                                    Prtry := 'TI';
+                                                BankAccountType::TOUZA:
+                                                    Prtry := 'TO';
+                                            End;
+                                        end;
+                                    end;
+                                }
+                            }
+                        }
+
+                        textelement(Purp)
+                        {
+                            textelement(PurpPrtry)
+                            {
+                                XmlName = 'Prtry';
+
+                                trigger OnBeforePassVariable()
+                                begin
+                                    PurpPrtry := '21';
+                                end;
+                            }
                         }
                     }
                 }
@@ -327,7 +372,6 @@ xmlport 58150 BankXML_53_ROPE
     trigger OnInitXmlPort()
     begin
         "Gen. Journal Line".SETRANGE("Gen. Journal Line"."Journal Template Name", 'PAYMENTS');
-        "Gen. Journal Line".SETRANGE("Gen. Journal Line".Comment, '53_ROPE');
         "Gen. Journal Line".SETRANGE("Gen. Journal Line"."Journal Batch Name", 'CITI');
     end;
 
@@ -341,15 +385,10 @@ xmlport 58150 BankXML_53_ROPE
 
 
     var
-        GVRE_Vendor: Record "Vendor";
         GVTX_VendorName: Text;
-        GVIN_Count: Integer;
-        GVRE_GenJournalLine: Record "Gen. Journal Line";
         GVRE_BankAccount: Record "Bank Account";
         GVRE_VendorBankAccount: Record "Vendor Bank Account";
-        GVRE_XMLInterfaceLog: Record "XML Interface Log";
         Text0001: Label '%1 ''s bank %2 doesn''t exist.';
-        Text0002: Label '%1 ''s bank account no. doesn''t exist.';
         GVIN_CtrlSum: Integer;
 }
 

@@ -81,6 +81,18 @@ xmlport 58160 BankXML_53_ROPT
                                 end;
                             }
                         }
+                        textelement(LclInstrm)
+                        {
+                            textelement(LclInstrmCd)
+                            {
+                                XmlName = 'Cd';
+
+                                trigger OnBeforePassVariable()
+                                begin
+                                    LclInstrmCd := 'CITI392';
+                                end;
+                            }
+                        }
                     }
                     textelement(ReqdExctnDt)
                     {
@@ -319,7 +331,7 @@ xmlport 58160 BankXML_53_ROPT
     trigger OnInitXmlPort()
     begin
         "Gen. Journal Line".SETRANGE("Gen. Journal Line"."Journal Template Name", 'PAYMENTS');
-        "Gen. Journal Line".SETRANGE("Gen. Journal Line".Comment, '53_ROPT');
+        //"Gen. Journal Line".SETRANGE("Gen. Journal Line".Comment, '53_ROPT');
         "Gen. Journal Line".SETRANGE("Gen. Journal Line"."Journal Batch Name", 'CITI');
     end;
 

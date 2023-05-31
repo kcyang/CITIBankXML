@@ -23,22 +23,26 @@ pageextension 58150 PaymentJournalExt extends "Payment Journal"
                 PromotedIsBig = true;
                 ApplicationArea = All;
                 trigger OnAction()
+                var
+                    lineCnt: Integer;
                 begin
                     IF COMPANYNAME = 'Guerbet Japan KK' THEN BEGIN
 
                         GVRE_GenJournalLine.RESET;
                         GVRE_GenJournalLine.SETRANGE(GVRE_GenJournalLine."Journal Template Name", 'PAYMENTS');
                         GVRE_GenJournalLine.SETRANGE(GVRE_GenJournalLine."Journal Batch Name", 'CITI');
-                        GVRE_GenJournalLine.SETFILTER(GVRE_GenJournalLine.Comment, '%1', '<>53_ROPE');
                         IF GVRE_GenJournalLine.FIND('-') THEN BEGIN
-                            GVRE_GenJournalLine.SETFILTER(GVRE_GenJournalLine.Comment, '%1', '<>53_ROPT');
-                            IF GVRE_GenJournalLine.FIND('-') THEN BEGIN
-                                ERROR('There are empty or wrong values in comment fields. Please check the comment field in CITI batch');
-                            END;
+                            Clear(lineCnt);
+                            lineCnt := 0;
+                            repeat
+                                lineCnt += 1;
+                                if GVRE_GenJournalLine."Recipient Bank Account" = '' then
+                                    Error('The Recipient Bank Account is missing.\n Please check line %1.', lineCnt);
+                            until GVRE_GenJournalLine.Next() = 0;
                         END;
 
-                        GVTX_Options := 'OPEX, International OPEX';
-                        GVTX_OptionsMessage := 'Choose one of the following options';
+                        GVTX_Options := '国内送金(Domestic), 海外送金(Overseas)';
+                        GVTX_OptionsMessage := 'Select the type of file you want to transfer.\n These are generated based on the type of Vendor Bank Transfer Type.';
                         GVIN_OptionNumber := DIALOG.STRMENU(GVTX_Options, 1, GVTX_OptionsMessage);
 
                         GVCU_BankXML.GVFN_ExportData(GVIN_OptionNumber);
@@ -56,26 +60,11 @@ pageextension 58150 PaymentJournalExt extends "Payment Journal"
                 trigger OnAction()
                 begin
                     IF (Rec."Journal Template Name" = 'PAYMENTS') AND (Rec."Journal Batch Name" = 'CITI') THEN BEGIN
-                        GVTX_Options := 'OPEX, International OPEX, Check';
-                        GVTX_OptionsMessage := 'Choose one of the following options to uncheck';
+                        GVTX_Options := '国内送金(Domestic), 海外送金(Overseas)';
+                        GVTX_OptionsMessage := 'Select the type you want to recreate.';
                         GVIN_OptionNumber := DIALOG.STRMENU(GVTX_Options, 1, GVTX_OptionsMessage);
 
-                        IF GVIN_OptionNumber <> 3 THEN BEGIN
-                            GVCU_BankXML.GVFN_UncheckXML(GVIN_OptionNumber);
-                            CLEAR(GVCU_BankXML);
-                        END ELSE BEGIN
-                            GVRE_GenJournalLine.RESET;
-                            CurrPage.SETSELECTIONFILTER(GVRE_GenJournalLine);
-                            IF GVRE_GenJournalLine.FIND('-') THEN BEGIN
-                                REPEAT
-                                    IF (GVRE_GenJournalLine.Comment <> '53_ROPE') AND (GVRE_GenJournalLine.Comment <> '53_ROPT') THEN BEGIN
-                                        GVRE_GenJournalLine."XML Export Completion" := TRUE;
-                                        GVRE_GenJournalLine.MODIFY;
-                                    END;
-                                UNTIL GVRE_GenJournalLine.NEXT = 0;
-                            END;
-
-                        END;
+                        GVCU_BankXML.GVFN_UncheckXML(GVIN_OptionNumber);
                     END;
                 end;
             }
@@ -88,6 +77,5 @@ pageextension 58150 PaymentJournalExt extends "Payment Journal"
         GVTX_Options: Text;
         GVTX_OptionsMessage: Text;
         GVIN_OptionNumber: Integer;
-        Text002: TextConst ENU = 'There are lines that not XML exported.';
         GVRE_GenJournalLine: Record "Gen. Journal Line";
 }

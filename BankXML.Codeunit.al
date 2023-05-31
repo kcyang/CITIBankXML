@@ -27,7 +27,7 @@ codeunit 58150 BankXML
                     GVRE_GenJournalLine.SETRANGE(GVRE_GenJournalLine."Journal Template Name", 'PAYMENTS');
                     GVRE_GenJournalLine.SETRANGE(GVRE_GenJournalLine."Journal Batch Name", 'CITI');
                     GVRE_GenJournalLine.SetFilter(GVRE_GenJournalLine."XML Export Completion", '%1', FALSE);
-                    GVRE_GenJournalLine.SetFilter(GVRE_GenJournalLine.Comment, '%1', '53_ROPE');
+                    //GVRE_GenJournalLine.SetFilter(GVRE_GenJournalLine.Comment, '%1', '53_ROPE');
                     IF NOT GVRE_GenJournalLine.FIND('-') THEN BEGIN
                         ERROR('No lines to export');
                     END;
@@ -70,7 +70,7 @@ codeunit 58150 BankXML
                     GVRE_GenJournalLine.SETRANGE(GVRE_GenJournalLine."Journal Template Name", 'PAYMENTS');
                     GVRE_GenJournalLine.SETRANGE(GVRE_GenJournalLine."Journal Batch Name", 'CITI');
                     GVRE_GenJournalLine.SetFilter(GVRE_GenJournalLine."XML Export Completion", '%1', FALSE);
-                    GVRE_GenJournalLine.SetFilter(GVRE_GenJournalLine.Comment, '%1', '53_ROPT');
+                    //GVRE_GenJournalLine.SetFilter(GVRE_GenJournalLine.Comment, '%1', '53_ROPT');
                     IF NOT GVRE_GenJournalLine.FIND('-') THEN BEGIN
                         ERROR('No lines to export');
                     END;
@@ -119,7 +119,7 @@ codeunit 58150 BankXML
                     GVRE_GenJournalLine.RESET;
                     GVRE_GenJournalLine.SETRANGE(GVRE_GenJournalLine."XML Export Completion", TRUE);
                     GVRE_GenJournalLine.SETRANGE(GVRE_GenJournalLine."Journal Template Name", 'PAYMENTS');
-                    GVRE_GenJournalLine.SETRANGE(GVRE_GenJournalLine.Comment, '53_ROPE');
+                    //GVRE_GenJournalLine.SETRANGE(GVRE_GenJournalLine.Comment, '53_ROPE');
                     GVRE_GenJournalLine.SETRANGE(GVRE_GenJournalLine."Journal Batch Name", 'CITI');
                     IF GVRE_GenJournalLine.FIND('-') THEN BEGIN
                         REPEAT
@@ -137,7 +137,7 @@ codeunit 58150 BankXML
                     GVRE_GenJournalLine.RESET;
                     GVRE_GenJournalLine.SETRANGE(GVRE_GenJournalLine."XML Export Completion", TRUE);
                     GVRE_GenJournalLine.SETRANGE(GVRE_GenJournalLine."Journal Template Name", 'PAYMENTS');
-                    GVRE_GenJournalLine.SETRANGE(GVRE_GenJournalLine.Comment, '53_ROPT');
+                    //GVRE_GenJournalLine.SETRANGE(GVRE_GenJournalLine.Comment, '53_ROPT');
                     GVRE_GenJournalLine.SETRANGE(GVRE_GenJournalLine."Journal Batch Name", 'CITI');
                     IF GVRE_GenJournalLine.FIND('-') THEN BEGIN
                         REPEAT
