@@ -10,6 +10,14 @@ pageextension 58150 PaymentJournalExt extends "Payment Journal"
                 ApplicationArea = All;
             }
         }
+        addafter("Recipient Bank Account")
+        {
+            field("Bank Transfer Type"; Rec."Bank Transfer Type")
+            {
+                Editable = false;
+                ApplicationArea = All;
+            }
+        }
     }
     actions
     {

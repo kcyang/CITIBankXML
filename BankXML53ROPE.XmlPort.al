@@ -80,6 +80,13 @@ xmlport 58150 BankXML_53_ROPE
                             PmtMtd := 'TRF';
                         end;
                     }
+                    textelement(BtchBookg)
+                    {
+                        trigger OnBeforePassVariable()
+                        begin
+                            BtchBookg := 'TRUE';
+                        end;
+                    }
                     textelement(PmtTpInf)
                     {
                         textelement(SvcLvl)
@@ -205,40 +212,6 @@ xmlport 58150 BankXML_53_ROPE
                                 end;
                             }
                         }
-                        /*
-                        textelement(ChqInstr)
-                        {
-                            textelement(DlvrTo)
-                            {
-                                textelement("<nm4>")
-                                {
-                                    XmlName = 'Nm';
-
-                                    trigger OnBeforePassVariable()
-                                    begin
-                                        CLEAR(GVTX_VendorName);
-                                        IF "Gen. Journal Line"."Account Type" = "Gen. Journal Line"."Account Type"::Vendor THEN BEGIN
-                                            GVRE_VendorBankAccount.RESET;
-                                            GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount.Code, "Gen. Journal Line"."Recipient Bank Account");
-                                            GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount."Vendor No.", "Gen. Journal Line"."Account No.");
-                                            IF GVRE_VendorBankAccount.FINDSET THEN BEGIN
-                                                GVTX_VendorName := GVRE_VendorBankAccount.Name;
-                                            END;
-                                        END;
-                                        "<Nm4>" := GVTX_VendorName;
-                                    end;
-                                }
-                                textelement(Adr)
-                                {
-
-                                    trigger OnBeforePassVariable()
-                                    begin
-                                        //"<Adr>" := GVRE_Vendor.Address;
-                                    end;
-                                }
-                            }
-                        }
-                        */
                         textelement(CdtrAgt)
                         {
                             textelement("<fininstnid2>")
@@ -272,6 +245,19 @@ xmlport 58150 BankXML_53_ROPE
                                             END;
                                         end;
                                     }
+                                }
+                                textelement(ClrSysMmbIdPstlAdr)
+                                {
+                                    XmlName = 'PstlAdr';
+                                    textelement(ClrSysMmbIdPstlAdrCtry)
+                                    {
+                                        XmlName = 'Ctry';
+                                        trigger OnBeforePassVariable()
+                                        begin
+                                            ClrSysMmbIdPstlAdrCtry := 'JP';
+                                        end;
+                                    }
+
                                 }
                             }
                         }
@@ -373,6 +359,9 @@ xmlport 58150 BankXML_53_ROPE
     begin
         "Gen. Journal Line".SETRANGE("Gen. Journal Line"."Journal Template Name", 'PAYMENTS');
         "Gen. Journal Line".SETRANGE("Gen. Journal Line"."Journal Batch Name", 'CITI');
+        "Gen. Journal Line".SetFilter("Gen. Journal Line"."XML Export Completion", '%1', FALSE);
+        "Gen. Journal Line".CalcFields("Bank Transfer Type");
+        "Gen. Journal Line".SetFilter("Gen. Journal Line"."Bank Transfer Type", 'DOMESTIC');
     end;
 
     procedure PadZeroToFront(var InText: Text)

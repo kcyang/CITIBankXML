@@ -333,6 +333,9 @@ xmlport 58160 BankXML_53_ROPT
         "Gen. Journal Line".SETRANGE("Gen. Journal Line"."Journal Template Name", 'PAYMENTS');
         //"Gen. Journal Line".SETRANGE("Gen. Journal Line".Comment, '53_ROPT');
         "Gen. Journal Line".SETRANGE("Gen. Journal Line"."Journal Batch Name", 'CITI');
+        "Gen. Journal Line".SetFilter("Gen. Journal Line"."XML Export Completion", '%1', FALSE);
+        "Gen. Journal Line".CalcFields("Bank Transfer Type");
+        "Gen. Journal Line".SetFilter("Gen. Journal Line"."Bank Transfer Type", 'OVERSEAS');
     end;
 
     var
