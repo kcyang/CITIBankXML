@@ -21,7 +21,7 @@ xmlport 58150 BankXML_53_ROPE
 
                         trigger OnBeforePassVariable()
                         begin
-                            MsgId := 'GUERBET.NC4.JP1' + FORMAT(TODAY, 0, '<Year,2><Month,2><Day,2>') + '.' + FORMAT(TIME, 0, '<Hours24><Minutes,2><Seconds,2>') + '.53_ROPE';
+                            MsgId := 'GUERBET.NC4.JP1' + FORMAT(TODAY, 0, '<Year,2><Month,2><Day,2>') + '.' + FORMAT(TIME, 0, '<Hours24><Minutes,2><Seconds,2>');
                         end;
                     }
                     textelement(CreDtTm)
@@ -63,14 +63,13 @@ xmlport 58150 BankXML_53_ROPE
                         }
                     }
                 }
-                tableelement("Gen. Journal Line"; "Gen. Journal Line")
+                textelement(PmtInf)
                 {
-                    XmlName = 'PmtInf';
                     textelement(PmtInfId)
                     {
                         trigger OnBeforePassVariable()
                         begin
-                            PmtInfId := FORMAT("Gen. Journal Line"."Document No.") + '.' + FORMAT("Gen. Journal Line"."Line No.");
+                            PmtInfId := FORMAT("Gen. Journal Line"."Document No.");
                         end;
                     }
                     textelement(PmtMtd)
@@ -130,6 +129,33 @@ xmlport 58150 BankXML_53_ROPE
                                 "<Nm2>" := 'GUERBET JAPAN KK';
                             end;
                         }
+                        textelement(DbtrPstlAdr)
+                        {
+                            XmlName = 'PstlAdr';
+                            textelement(DbtrPstlAdrCtry)
+                            {
+                                XmlName = 'Ctry';
+                                trigger OnBeforePassVariable()
+                                begin
+                                    DbtrPstlAdrCtry := 'JP';
+                                end;
+                            }
+                        }
+                        textelement(DbtrId)
+                        {
+                            XmlName = 'Id';
+                            textelement(DbtrIdOrdId)
+                            {
+                                XmlName = 'OrgId';
+                                textelement(BICOrBEI)
+                                {
+                                    trigger OnBeforePassVariable()
+                                    begin
+                                        BICOrBEI := 'CITIJPJT';
+                                    end;
+                                }
+                            }
+                        }
                     }
                     textelement(DbtrAcct)
                     {
@@ -152,6 +178,15 @@ xmlport 58150 BankXML_53_ROPE
                                     end;
                                 }
                             }
+                        }
+                        textelement(DbtrAcctCcy)
+                        {
+                            XmlName = 'Ccy';
+
+                            trigger OnBeforePassVariable()
+                            begin
+                                DbtrAcctCcy := 'JPY';
+                            end;
                         }
                     }
                     textelement(DbtrAgt)
@@ -180,8 +215,10 @@ xmlport 58150 BankXML_53_ROPE
                             }
                         }
                     }
-                    textelement(CdtTrfTxInf)
+                    tableelement("Gen. Journal Line"; "Gen. Journal Line")
                     {
+                        XmlName = 'CdtTrfTxInf';
+
                         textelement(PmtId)
                         {
                             textelement(EndToEndId)
@@ -272,6 +309,18 @@ xmlport 58150 BankXML_53_ROPE
                                     "<Nm3>" := GVTX_VendorName;
                                 end;
                             }
+                            textelement(CdtrPstlAdr)
+                            {
+                                XmlName = 'PstlAdr';
+                                textelement(CdtrPstlAdrCtry)
+                                {
+                                    XmlName = 'Ctry';
+                                    trigger OnBeforePassVariable()
+                                    begin
+                                        CdtrPstlAdrCtry := 'JP';
+                                    end;
+                                }
+                            }
                         }
                         textelement(CdtrAcct)
                         {
@@ -337,6 +386,17 @@ xmlport 58150 BankXML_53_ROPE
                                 end;
                             }
                         }
+
+                        // textelement(RmtInf)
+                        // {
+                        //     textelement(Ustrd)
+                        //     {
+                        //         trigger OnBeforePassVariable()
+                        //         begin
+                        //             Ustrd := '';
+                        //         end;
+                        //     }
+                        // }
                     }
                 }
             }
