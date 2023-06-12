@@ -403,18 +403,6 @@ xmlport 58150 BankXML_53_ROPE
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     trigger OnInitXmlPort()
     begin
         "Gen. Journal Line".SETRANGE("Gen. Journal Line"."Journal Template Name", 'PAYMENTS');

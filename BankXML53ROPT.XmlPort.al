@@ -8,6 +8,315 @@ xmlport 58160 BankXML_53_ROPT
 
     schema
     {
+        /*        
+                textelement(Document)
+                {
+                    textelement(CstmrCdtTrfInitn)
+                    {
+                        textelement(GrpHdr)
+                        {
+                            textelement(MsgId)
+                            {
+                                TextType = Text;
+
+                                trigger OnBeforePassVariable()
+                                begin
+                                    MsgId := 'GUERBET.NC4.JP1' + FORMAT(TODAY, 0, '<Year,2><Month,2><Day,2>') + '.' + FORMAT(TIME, 0, '<Hours24><Minutes,2><Seconds,2>') + '.53_ROPT';
+                                end;
+                            }
+                            textelement(CreDtTm)
+                            {
+
+                                trigger OnBeforePassVariable()
+                                begin
+                                    CreDtTm := FORMAT(DT2DATE(CURRENTDATETIME), 0, 9) + 'T'
+                                    + CONVERTSTR(FORMAT(DT2TIME(CURRENTDATETIME), 0, '<hours24,2>:<Minutes,2>:<Seconds,2>'), ' ', '0')
+                                    + '.111';
+                                end;
+                            }
+                            textelement(NbOfTxs)
+                            {
+                                trigger OnBeforePassVariable()
+                                begin
+                                    NbOfTxs := FORMAT("Gen. Journal Line".COUNT);
+                                end;
+                            }
+                            textelement(InitgPty)
+                            {
+                                textelement(Nm)
+                                {
+
+                                    trigger OnBeforePassVariable()
+                                    begin
+                                        Nm := 'GUERBET JAPAN KK'
+                                    end;
+                                }
+                            }
+                        }
+                        tableelement("Gen. Journal Line"; "Gen. Journal Line")
+                        {
+                            XmlName = 'PmtInf';
+                            textelement(PmtInfId)
+                            {
+                                trigger OnBeforePassVariable()
+                                begin
+                                    PmtInfId := FORMAT("Gen. Journal Line"."Document No.") + '.' + FORMAT("Gen. Journal Line"."Line No.");
+                                end;
+                            }
+                            textelement(PmtMtd)
+                            {
+                                trigger OnBeforePassVariable()
+                                begin
+                                    PmtMtd := 'TRF';
+                                end;
+                            }
+                            textelement(PmtTpInf)
+                            {
+                                textelement(SvcLvl)
+                                {
+                                    textelement(Cd)
+                                    {
+                                        trigger OnBeforePassVariable()
+                                        begin
+                                            Cd := 'URGP';
+                                        end;
+                                    }
+                                }
+                                textelement(LclInstrm)
+                                {
+                                    textelement(LclInstrmCd)
+                                    {
+                                        XmlName = 'Cd';
+
+                                        trigger OnBeforePassVariable()
+                                        begin
+                                            LclInstrmCd := 'CITI392';
+                                        end;
+                                    }
+                                }
+                            }
+                            textelement(ReqdExctnDt)
+                            {
+                                trigger OnBeforePassVariable()
+                                begin
+                                    ReqdExctnDt := FORMAT("Gen. Journal Line"."Posting Date", 0, 9);
+                                end;
+                            }
+                            textelement(Dbtr)
+                            {
+                                textelement("<nm2>")
+                                {
+                                    XmlName = 'Nm';
+
+                                    trigger OnBeforePassVariable()
+                                    begin
+                                        "<Nm2>" := 'GUERBET JAPAN KK';
+                                    end;
+                                }
+                            }
+                            textelement(DbtrAcct)
+                            {
+                                textelement(Id)
+                                {
+                                    textelement(Othr)
+                                    {
+                                        textelement("<id2>")
+                                        {
+                                            XmlName = 'Id';
+
+                                            trigger OnBeforePassVariable()
+                                            begin
+                                                GVRE_BankAccount.RESET;
+                                                GVRE_BankAccount.SETFILTER(GVRE_BankAccount."No.", 'B05');
+                                                IF GVRE_BankAccount.FINDSET THEN BEGIN
+                                                    "<Id2>" := GVRE_BankAccount."Bank Account No.";
+
+                                                END;
+                                                //bank account b05
+                                            end;
+                                        }
+                                    }
+                                }
+                            }
+                            textelement(DbtrAgt)
+                            {
+                                MaxOccurs = Once;
+                                textelement(FinInstnId)
+                                {
+                                    textelement(BIC)
+                                    {
+
+                                        trigger OnBeforePassVariable()
+                                        begin
+                                            BIC := 'CITIJPJT';
+                                        end;
+                                    }
+                                    textelement(PstlAdr)
+                                    {
+                                        textelement(Ctry)
+                                        {
+
+                                            trigger OnBeforePassVariable()
+                                            begin
+                                                Ctry := 'JP';
+                                            end;
+                                        }
+                                    }
+                                }
+                            }
+                            textelement(CdtTrfTxInf)
+                            {
+                                textelement(PmtId)
+                                {
+                                    textelement(EndToEndId)
+                                    {
+
+                                        trigger OnBeforePassVariable()
+                                        begin
+                                            EndToEndId := FORMAT("Gen. Journal Line"."Document No.") + '.' + FORMAT("Gen. Journal Line"."Line No.");
+                                        end;
+                                    }
+                                }
+                                textelement(Amt)
+                                {
+                                    textelement(InstdAmt)
+                                    {
+                                        textattribute(Ccy)
+                                        {
+
+                                            trigger OnBeforePassVariable()
+                                            begin
+                                                IF "Gen. Journal Line"."Currency Code" = '' THEN BEGIN
+                                                    Ccy := 'JPY';
+                                                END ELSE
+                                                    IF "Gen. Journal Line"."Currency Code" <> '' THEN BEGIN
+                                                        Ccy := "Gen. Journal Line"."Currency Code";
+                                                    END;
+                                            end;
+                                        }
+
+                                        trigger OnBeforePassVariable()
+                                        begin
+                                            InstdAmt := DELCHR(FORMAT("Gen. Journal Line".Amount), '=', ',');
+                                        end;
+                                    }
+                                }
+                                textelement(CdtrAgt)
+                                {
+                                    textelement("<fininstnid2>")
+                                    {
+                                        XmlName = 'FinInstnId';
+                                        textelement("<bic2>")
+                                        {
+                                            XmlName = 'BIC';
+
+                                            trigger OnBeforePassVariable()
+                                            begin
+                                                IF "Gen. Journal Line"."Account Type" = "Gen. Journal Line"."Account Type"::Vendor THEN BEGIN
+
+                                                    GVRE_VendorBankAccount.RESET;
+                                                    GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount.Code, "Gen. Journal Line"."Recipient Bank Account");
+                                                    GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount."Vendor No.", "Gen. Journal Line"."Account No.");
+                                                    IF GVRE_VendorBankAccount.FINDSET THEN BEGIN
+                                                        IF GVRE_VendorBankAccount."SWIFT Code" <> '' THEN BEGIN
+                                                            "<BIC2>" := GVRE_VendorBankAccount."SWIFT Code";
+                                                        END ELSE BEGIN
+                                                            MESSAGE(Text0001, "Gen. Journal Line"."Account No.", 'SWIFT code');
+                                                            ERROR('SWIFT code');
+                                                        END;
+                                                    END;
+                                                END;
+
+                                            end;
+                                        }
+                                        textelement("<pstladr2>")
+                                        {
+                                            XmlName = 'PstlAdr';
+                                            textelement("<ctry2>")
+                                            {
+                                                XmlName = 'Ctry';
+
+                                                trigger OnBeforePassVariable()
+                                                begin
+                                                    IF GVRE_VendorBankAccount."Country/Region Code" <> '' THEN BEGIN
+                                                        "<Ctry2>" := GVRE_VendorBankAccount."Country/Region Code";
+                                                    END ELSE BEGIN
+                                                        MESSAGE(Text0001, "Gen. Journal Line"."Account No.", 'Country/Region Code');
+                                                        ERROR('Country/Region Code');
+                                                    END;
+                                                end;
+                                            }
+                                        }
+                                    }
+                                }
+                                textelement(Cdtr)
+                                {
+                                    textelement("<nm3>")
+                                    {
+                                        XmlName = 'Nm';
+
+                                        trigger OnBeforePassVariable()
+                                        begin
+                                            CLEAR(GVTX_VendorName);
+                                            // GVRE_Vendor.RESET;
+                                            // GVRE_Vendor.SETRANGE(GVRE_Vendor."No.", "Gen. Journal Line"."Account No.");
+                                            // IF GVRE_Vendor.FIND('-') THEN BEGIN
+                                            //     GVTX_VendorName := GVRE_Vendor.Name;
+                                            // END;
+                                            IF GVRE_VendorBankAccount.FindSet() then begin
+                                                GVTX_VendorName := GVRE_VendorBankAccount.Name;
+                                            end;
+                                            "<Nm3>" := GVTX_VendorName;
+                                        end;
+                                    }
+                                }
+                                textelement(CdtrAcct)
+                                {
+                                    textelement("<id3>")
+                                    {
+                                        XmlName = 'Id';
+                                        textelement("<othr2>")
+                                        {
+                                            XmlName = 'Othr';
+                                            textelement("<id4>")
+                                            {
+                                                XmlName = 'Id';
+
+                                                trigger OnBeforePassVariable()
+                                                begin
+                                                    //credit account no.
+                                                    IF GVRE_VendorBankAccount."Bank Account No." <> '' THEN BEGIN
+                                                        "<Id4>" := GVRE_VendorBankAccount."Bank Account No.";
+                                                    END ELSE BEGIN
+                                                        MESSAGE(Text0001, "Gen. Journal Line"."Account No.", 'Bank Account No.');
+                                                        ERROR('Bank Account No.');
+                                                    END;
+                                                end;
+                                            }
+                                        }
+                                    }
+                                }
+                                textelement(RgltryRptg)
+                                {
+                                    textelement(Dtls)
+                                    {
+                                        textelement("<inf>")
+                                        {
+                                            XmlName = 'Inf';
+
+                                            trigger OnBeforePassVariable()
+                                            begin
+                                                "<Inf>" := '/TWNREG/3470A NW';
+                                            end;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+        */
+
         textelement(Document)
         {
             textelement(CstmrCdtTrfInitn)
@@ -20,12 +329,11 @@ xmlport 58160 BankXML_53_ROPT
 
                         trigger OnBeforePassVariable()
                         begin
-                            MsgId := 'GUERBET.NC4.JP1' + FORMAT(TODAY, 0, '<Year,2><Month,2><Day,2>') + '.' + FORMAT(TIME, 0, '<Hours24><Minutes,2><Seconds,2>') + '.53_ROPT';
+                            MsgId := 'GUERBET.NC4.JP1' + FORMAT(TODAY, 0, '<Year,2><Month,2><Day,2>') + '.' + FORMAT(TIME, 0, '<Hours24><Minutes,2><Seconds,2>');
                         end;
                     }
                     textelement(CreDtTm)
                     {
-
                         trigger OnBeforePassVariable()
                         begin
                             CreDtTm := FORMAT(DT2DATE(CURRENTDATETIME), 0, 9) + 'T'
@@ -40,11 +348,22 @@ xmlport 58160 BankXML_53_ROPT
                             NbOfTxs := FORMAT("Gen. Journal Line".COUNT);
                         end;
                     }
+                    textelement(CtrlSum)
+                    {
+                        trigger OnBeforePassVariable()
+                        begin
+                            IF "Gen. Journal Line".FIND('-') THEN BEGIN
+                                REPEAT
+                                    GVIN_CtrlSum += "Gen. Journal Line".Amount;
+                                UNTIL "Gen. Journal Line".NEXT = 0;
+                                CtrlSum := FORMAT(GVIN_CtrlSum);
+                            END;
+                        end;
+                    }
                     textelement(InitgPty)
                     {
                         textelement(Nm)
                         {
-
                             trigger OnBeforePassVariable()
                             begin
                                 Nm := 'GUERBET JAPAN KK'
@@ -52,14 +371,13 @@ xmlport 58160 BankXML_53_ROPT
                         }
                     }
                 }
-                tableelement("Gen. Journal Line"; "Gen. Journal Line")
+                textelement(PmtInf)
                 {
-                    XmlName = 'PmtInf';
                     textelement(PmtInfId)
                     {
                         trigger OnBeforePassVariable()
                         begin
-                            PmtInfId := FORMAT("Gen. Journal Line"."Document No.") + '.' + FORMAT("Gen. Journal Line"."Line No.");
+                            PmtInfId := FORMAT("Gen. Journal Line"."Document No.");
                         end;
                     }
                     textelement(PmtMtd)
@@ -67,6 +385,13 @@ xmlport 58160 BankXML_53_ROPT
                         trigger OnBeforePassVariable()
                         begin
                             PmtMtd := 'TRF';
+                        end;
+                    }
+                    textelement(BtchBookg)
+                    {
+                        trigger OnBeforePassVariable()
+                        begin
+                            BtchBookg := 'TRUE';
                         end;
                     }
                     textelement(PmtTpInf)
@@ -112,6 +437,33 @@ xmlport 58160 BankXML_53_ROPT
                                 "<Nm2>" := 'GUERBET JAPAN KK';
                             end;
                         }
+                        textelement(DbtrPstlAdr)
+                        {
+                            XmlName = 'PstlAdr';
+                            textelement(DbtrPstlAdrCtry)
+                            {
+                                XmlName = 'Ctry';
+                                trigger OnBeforePassVariable()
+                                begin
+                                    DbtrPstlAdrCtry := 'JP';
+                                end;
+                            }
+                        }
+                        textelement(DbtrId)
+                        {
+                            XmlName = 'Id';
+                            textelement(DbtrIdOrdId)
+                            {
+                                XmlName = 'OrgId';
+                                textelement(BICOrBEI)
+                                {
+                                    trigger OnBeforePassVariable()
+                                    begin
+                                        BICOrBEI := 'CITIJPJT';
+                                    end;
+                                }
+                            }
+                        }
                     }
                     textelement(DbtrAcct)
                     {
@@ -126,15 +478,23 @@ xmlport 58160 BankXML_53_ROPT
                                     trigger OnBeforePassVariable()
                                     begin
                                         GVRE_BankAccount.RESET;
-                                        GVRE_BankAccount.SETFILTER(GVRE_BankAccount."No.", 'B05');
+                                        GVRE_BankAccount.SETFILTER(GVRE_BankAccount."No.", 'B001');
                                         IF GVRE_BankAccount.FINDSET THEN BEGIN
                                             "<Id2>" := GVRE_BankAccount."Bank Account No.";
-
                                         END;
-                                        //bank account b05
+                                        //bank account B001
                                     end;
                                 }
                             }
+                        }
+                        textelement(DbtrAcctCcy)
+                        {
+                            XmlName = 'Ccy';
+
+                            trigger OnBeforePassVariable()
+                            begin
+                                DbtrAcctCcy := 'JPY';
+                            end;
                         }
                     }
                     textelement(DbtrAgt)
@@ -163,8 +523,10 @@ xmlport 58160 BankXML_53_ROPT
                             }
                         }
                     }
-                    textelement(CdtTrfTxInf)
+                    tableelement("Gen. Journal Line"; "Gen. Journal Line")
                     {
+                        XmlName = 'CdtTrfTxInf';
+
                         textelement(PmtId)
                         {
                             textelement(EndToEndId)
@@ -196,7 +558,7 @@ xmlport 58160 BankXML_53_ROPT
 
                                 trigger OnBeforePassVariable()
                                 begin
-                                    InstdAmt := DELCHR(FORMAT("Gen. Journal Line".Amount), '=', ',');
+                                    InstdAmt := DELCHR(FORMAT("Gen. Journal Line"."Amount (LCY)"), '=', ',');
                                 end;
                             }
                         }
@@ -205,46 +567,51 @@ xmlport 58160 BankXML_53_ROPT
                             textelement("<fininstnid2>")
                             {
                                 XmlName = 'FinInstnId';
-                                textelement("<bic2>")
+                                textelement(ClrSysMmbId)
                                 {
-                                    XmlName = 'BIC';
-
-                                    trigger OnBeforePassVariable()
-                                    begin
-                                        IF "Gen. Journal Line"."Account Type" = "Gen. Journal Line"."Account Type"::Vendor THEN BEGIN
-
-                                            GVRE_VendorBankAccount.RESET;
-                                            GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount.Code, "Gen. Journal Line"."Recipient Bank Account");
-                                            GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount."Vendor No.", "Gen. Journal Line"."Account No.");
-                                            IF GVRE_VendorBankAccount.FINDSET THEN BEGIN
-                                                IF GVRE_VendorBankAccount."SWIFT Code" <> '' THEN BEGIN
-                                                    "<BIC2>" := GVRE_VendorBankAccount."SWIFT Code";
-                                                END ELSE BEGIN
-                                                    MESSAGE(Text0001, "Gen. Journal Line"."Account No.", 'SWIFT code');
-                                                    ERROR('SWIFT code');
-                                                END;
-                                            END;
-                                        END;
-
-                                    end;
-                                }
-                                textelement("<pstladr2>")
-                                {
-                                    XmlName = 'PstlAdr';
-                                    textelement("<ctry2>")
+                                    textelement(ClrSysMmbIdBIC)
                                     {
-                                        XmlName = 'Ctry';
+                                        XmlName = 'BIC';
 
                                         trigger OnBeforePassVariable()
+                                        var
+                                            LV_BankBranchNo: Text;
                                         begin
+                                            CLEAR(GVTX_VendorName);
+                                            Clear(LV_BankBranchNo);
+                                            IF "Gen. Journal Line"."Account Type" = "Gen. Journal Line"."Account Type"::Vendor THEN BEGIN
+                                                GVRE_VendorBankAccount.RESET;
+                                                GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount.Code, "Gen. Journal Line"."Recipient Bank Account");
+                                                GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount."Vendor No.", "Gen. Journal Line"."Account No.");
+                                                IF GVRE_VendorBankAccount.FINDSET THEN BEGIN
+                                                    GVTX_VendorName := GVRE_VendorBankAccount.Name;
+                                                    ClrSysMmbIdBIC := GVRE_VendorBankAccount."SWIFT Code";
+                                                END ELSE BEGIN
+                                                    MESSAGE(Text0001, "Gen. Journal Line"."Account No.", 'SWIFT Code');
+                                                    ERROR('SWIFT Code');
+                                                END;
+                                            END;
+                                        end;
+                                    }
+                                }
+                                textelement(ClrSysMmbIdPstlAdr)
+                                {
+                                    XmlName = 'PstlAdr';
+                                    textelement(ClrSysMmbIdPstlAdrCtry)
+                                    {
+                                        XmlName = 'Ctry';
+                                        trigger OnBeforePassVariable()
+                                        begin
+                                            //ClrSysMmbIdPstlAdrCtry := 'JP';
                                             IF GVRE_VendorBankAccount."Country/Region Code" <> '' THEN BEGIN
-                                                "<Ctry2>" := GVRE_VendorBankAccount."Country/Region Code";
+                                                ClrSysMmbIdPstlAdrCtry := GVRE_VendorBankAccount."Country/Region Code";
                                             END ELSE BEGIN
                                                 MESSAGE(Text0001, "Gen. Journal Line"."Account No.", 'Country/Region Code');
                                                 ERROR('Country/Region Code');
                                             END;
                                         end;
                                     }
+
                                 }
                             }
                         }
@@ -256,17 +623,20 @@ xmlport 58160 BankXML_53_ROPT
 
                                 trigger OnBeforePassVariable()
                                 begin
-                                    CLEAR(GVTX_VendorName);
-                                    // GVRE_Vendor.RESET;
-                                    // GVRE_Vendor.SETRANGE(GVRE_Vendor."No.", "Gen. Journal Line"."Account No.");
-                                    // IF GVRE_Vendor.FIND('-') THEN BEGIN
-                                    //     GVTX_VendorName := GVRE_Vendor.Name;
-                                    // END;
-                                    IF GVRE_VendorBankAccount.FindSet() then begin
-                                        GVTX_VendorName := GVRE_VendorBankAccount.Name;
-                                    end;
                                     "<Nm3>" := GVTX_VendorName;
                                 end;
+                            }
+                            textelement(CdtrPstlAdr)
+                            {
+                                XmlName = 'PstlAdr';
+                                textelement(CdtrPstlAdrCtry)
+                                {
+                                    XmlName = 'Ctry';
+                                    trigger OnBeforePassVariable()
+                                    begin
+                                        CdtrPstlAdrCtry := 'JP';
+                                    end;
+                                }
                             }
                         }
                         textelement(CdtrAcct)
@@ -283,31 +653,54 @@ xmlport 58160 BankXML_53_ROPT
 
                                         trigger OnBeforePassVariable()
                                         begin
-                                            //credit account no.
-                                            IF GVRE_VendorBankAccount."Bank Account No." <> '' THEN BEGIN
+                                            IF GVRE_VendorBankAccount.FINDSET THEN BEGIN
                                                 "<Id4>" := GVRE_VendorBankAccount."Bank Account No.";
                                             END ELSE BEGIN
-                                                MESSAGE(Text0001, "Gen. Journal Line"."Account No.", 'Bank Account No.');
+                                                MESSAGE(Text0001, GVRE_VendorBankAccount."Vendor No.", 'Bank Account No.');
                                                 ERROR('Bank Account No.');
                                             END;
                                         end;
                                     }
                                 }
                             }
-                        }
-                        textelement(RgltryRptg)
-                        {
-                            textelement(Dtls)
-                            {
-                                textelement("<inf>")
-                                {
-                                    XmlName = 'Inf';
 
-                                    trigger OnBeforePassVariable()
-                                    begin
-                                        "<Inf>" := '/TWNREG/3470A NW';
-                                    end;
-                                }
+                            // textelement(Tp)
+                            // {
+                            //     textelement(Prtry)
+                            //     {
+                            //         trigger OnBeforePassVariable()
+                            //         var
+                            //             BankAccountType: Enum "Bank Account Type";
+                            //         begin
+                            //             IF GVRE_VendorBankAccount.FindSet() THEN begin
+                            //                 Case GVRE_VendorBankAccount."Bank Account Type" of
+                            //                     BankAccountType::" ":
+                            //                         Prtry := 'SO';
+                            //                     BankAccountType::FUTSUU:
+                            //                         Prtry := 'FU';
+                            //                     BankAccountType::SONOTA:
+                            //                         Prtry := 'SO';
+                            //                     BankAccountType::CHOCHIKU:
+                            //                         Prtry := 'TI';
+                            //                     BankAccountType::TOUZA:
+                            //                         Prtry := 'TO';
+                            //                 End;
+                            //             end;
+                            //         end;
+                            //     }
+                            // }
+                        }
+
+                        textelement(Purp)
+                        {
+                            textelement(PurpPrtry)
+                            {
+                                XmlName = 'Prtry';
+
+                                trigger OnBeforePassVariable()
+                                begin
+                                    PurpPrtry := '21';
+                                end;
                             }
                         }
                     }
@@ -316,37 +709,29 @@ xmlport 58160 BankXML_53_ROPT
         }
     }
 
-    requestpage
-    {
-
-        layout
-        {
-        }
-
-        actions
-        {
-        }
-    }
-
     trigger OnInitXmlPort()
     begin
         "Gen. Journal Line".SETRANGE("Gen. Journal Line"."Journal Template Name", 'PAYMENTS');
-        //"Gen. Journal Line".SETRANGE("Gen. Journal Line".Comment, '53_ROPT');
         "Gen. Journal Line".SETRANGE("Gen. Journal Line"."Journal Batch Name", 'CITI');
         "Gen. Journal Line".SetFilter("Gen. Journal Line"."XML Export Completion", '%1', FALSE);
         "Gen. Journal Line".CalcFields("Bank Transfer Type");
         "Gen. Journal Line".SetFilter("Gen. Journal Line"."Bank Transfer Type", 'OVERSEAS');
     end;
 
+    procedure PadZeroToFront(var InText: Text)
     var
-        GVRE_Vendor: Record "Vendor";
+        PaddedText: Text[7];
+    begin
+        PaddedText := StrSubstNo('%1%2', PadStr('', 7 - StrLen(InText), '0'), InText);
+        InText := PaddedText;
+    end;
+
+    var
         GVTX_VendorName: Text;
-        GVIN_Count: Integer;
-        GVRE_GenJournalLine: Record "Gen. Journal Line";
         GVRE_BankAccount: Record "Bank Account";
         GVRE_VendorBankAccount: Record "Vendor Bank Account";
-        GVRE_XMLInterfaceLog: Record "XML Interface Log";
-        Text0001: Label '%1 ''s %2 doesn''t exist.';
-        GVCO_Currency: Code[10];
+        Text0001: Label '%1 ''s bank %2 doesn''t exist.';
+        GVIN_CtrlSum: Integer;
+
 }
 
