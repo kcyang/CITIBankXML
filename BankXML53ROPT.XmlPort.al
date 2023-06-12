@@ -558,7 +558,7 @@ xmlport 58160 BankXML_53_ROPT
 
                                 trigger OnBeforePassVariable()
                                 begin
-                                    InstdAmt := DELCHR(FORMAT("Gen. Journal Line"."Amount (LCY)"), '=', ',');
+                                    InstdAmt := DELCHR(FORMAT("Gen. Journal Line"."Amount"), '=', ',');
                                 end;
                             }
                         }
@@ -634,7 +634,13 @@ xmlport 58160 BankXML_53_ROPT
                                     XmlName = 'Ctry';
                                     trigger OnBeforePassVariable()
                                     begin
-                                        CdtrPstlAdrCtry := 'JP';
+                                        //CdtrPstlAdrCtry := 'JP';
+                                        IF GVRE_VendorBankAccount."Country/Region Code" <> '' THEN BEGIN
+                                            CdtrPstlAdrCtry := GVRE_VendorBankAccount."Country/Region Code";
+                                        END ELSE BEGIN
+                                            MESSAGE(Text0001, "Gen. Journal Line"."Account No.", 'Country/Region Code');
+                                            ERROR('Country/Region Code');
+                                        END;
                                     end;
                                 }
                             }
