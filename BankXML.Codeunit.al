@@ -14,6 +14,7 @@ codeunit 58150 BankXML
         Text0002: Label 'The Export Failed';
         TempBlob: Codeunit "Temp Blob";
         base64Convert: Codeunit "Base64 Convert";
+        //base64Convert: Codeunit "Base64Convert Online";
         jsonBody: Text;
         httpClient: HttpClient;
         httpContent: HttpContent;
@@ -24,8 +25,12 @@ codeunit 58150 BankXML
 
 
     procedure GVFN_ExportData(var PAR_Options: Integer)
+    var
+        base64string: Text;
+        xmlResult: Text;
     begin
-
+        Clear(base64string);
+        Clear(xmlResult);
         CASE PAR_Options OF
             1:
                 BEGIN
@@ -46,30 +51,25 @@ codeunit 58150 BankXML
                     TempBlob.CreateOutStream(GVOS_OutputStream);
                     GVBO_IsExported := XMLPORT.EXPORT(XMLPORT::BankXML_53_ROPE, GVOS_OutputStream);
                     TempBlob.CreateInStream(GVOS_InputStream);
-                    CopyStream(GVOS_OutputStream, GVOS_InputStream);
-                    //파일로 내려받는 부분 삭제.
+                    //파일로 내려받는 부분 삭제.START
+                    //CopyStream(GVOS_OutputStream, GVOS_InputStream);
                     //DownloadFromStream(GVOS_InputStream, 'Export CITI XML', '', '', GVTX_XMLName);
-                    jsonBody := ' {"base64":"' + base64Convert.ToBase64(GVOS_InputStream) + '","fileName":"' + GVTX_XMLName + '","fileType":text/xml"", "fileExt":"TXT"}';
+                    //파일로 내려받는 부분 삭제.END
+                    base64string := base64Convert.ToBase64(GVOS_InputStream);
+                    jsonBody := ' {"base64":"' + base64string + '","fileName":"' + GVTX_XMLName + '","fileType":"text/xml", "fileExt":"TXT"}';
                     httpContent.WriteFrom(jsonBody);
                     httpContent.GetHeaders(httpHeader);
                     httpHeader.Remove('Content-Type');
                     httpHeader.Add('Content-Type', 'application/json');
 
-                    // 다른 방식의 POST START---------------
-                    // httpRequest.SetRequestUri('https://bulk53.azurewebsites.net/api/UploadFile');
-                    // httpRequest.Method('POST');
-                    // httpRequest.GetHeaders(httpHeader);
-                    // httpHeader.Add('accept', 'application/json');
-                    // httpRequest.Content := httpContent;
-                    // httpClient.Send(httpRequest, httpResponse);
-                    // 다른 방식의 POST END-----------------
-
-                    httpClient.Post('https://bulk53.azurewebsites.net/api/UploadFile', httpContent, httpResponse);
-                    //Here we should read the response to retrieve the URI
+                    httpClient.Post('https://bulk53sp.azurewebsites.net/api/bulk53sp', httpContent, httpResponse);
                     httpResponse.Content().ReadAs(respText);
-                    Message('Response :: %1', respText);
-                    message('File uploaded.');
 
+                    if httpResponse.HttpStatusCode = 200 then begin
+                        Message('アップロードが完了しました。The upload is complete.!');
+                    end else begin
+                        Error('Error :: %1', respText);
+                    end;
 
                     IF GVBO_IsExported THEN BEGIN
                         GVRE_XMLInterfaceLog.INIT;
@@ -107,8 +107,24 @@ codeunit 58150 BankXML
                     TempBlob.CreateOutStream(GVOS_OutputStream);
                     GVBO_IsExported := XMLPORT.EXPORT(XMLPORT::BankXML_53_ROPT, GVOS_OutputStream);
                     TempBlob.CreateInStream(GVOS_InputStream);
-                    CopyStream(GVOS_OutputStream, GVOS_InputStream);
-                    DownloadFromStream(GVOS_InputStream, 'Export CITI XML', '', '', GVTX_XMLName);
+                    // CopyStream(GVOS_OutputStream, GVOS_InputStream);
+                    // DownloadFromStream(GVOS_InputStream, 'Export CITI XML', '', '', GVTX_XMLName);
+                    base64string := base64Convert.ToBase64(GVOS_InputStream);
+                    jsonBody := ' {"base64":"' + base64string + '","fileName":"' + GVTX_XMLName + '","fileType":"text/xml", "fileExt":"TXT"}';
+                    httpContent.WriteFrom(jsonBody);
+                    httpContent.GetHeaders(httpHeader);
+                    httpHeader.Remove('Content-Type');
+                    httpHeader.Add('Content-Type', 'application/json');
+
+                    httpClient.Post('https://bulk53sp.azurewebsites.net/api/bulk53sp', httpContent, httpResponse);
+                    httpResponse.Content().ReadAs(respText);
+
+                    if httpResponse.HttpStatusCode = 200 then begin
+                        Message('アップロードが完了しました。The upload is complete.!');
+                    end else begin
+                        Error('Error :: %1', respText);
+                    end;
+
 
                     IF GVBO_IsExported THEN BEGIN
                         GVRE_XMLInterfaceLog.INIT;
