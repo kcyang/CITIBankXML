@@ -567,33 +567,31 @@ xmlport 58160 BankXML_53_ROPT
                             textelement("<fininstnid2>")
                             {
                                 XmlName = 'FinInstnId';
-                                textelement(ClrSysMmbId)
+                                textelement(ClrSysMmbIdBIC)
                                 {
-                                    textelement(ClrSysMmbIdBIC)
-                                    {
-                                        XmlName = 'BIC';
+                                    XmlName = 'BIC';
 
-                                        trigger OnBeforePassVariable()
-                                        var
-                                            LV_BankBranchNo: Text;
-                                        begin
-                                            CLEAR(GVTX_VendorName);
-                                            Clear(LV_BankBranchNo);
-                                            IF "Gen. Journal Line"."Account Type" = "Gen. Journal Line"."Account Type"::Vendor THEN BEGIN
-                                                GVRE_VendorBankAccount.RESET;
-                                                GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount.Code, "Gen. Journal Line"."Recipient Bank Account");
-                                                GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount."Vendor No.", "Gen. Journal Line"."Account No.");
-                                                IF GVRE_VendorBankAccount.FINDSET THEN BEGIN
-                                                    GVTX_VendorName := GVRE_VendorBankAccount.Name;
-                                                    ClrSysMmbIdBIC := GVRE_VendorBankAccount."SWIFT Code";
-                                                END ELSE BEGIN
-                                                    MESSAGE(Text0001, "Gen. Journal Line"."Account No.", 'SWIFT Code');
-                                                    ERROR('SWIFT Code');
-                                                END;
+                                    trigger OnBeforePassVariable()
+                                    var
+                                        LV_BankBranchNo: Text;
+                                    begin
+                                        CLEAR(GVTX_VendorName);
+                                        Clear(LV_BankBranchNo);
+                                        IF "Gen. Journal Line"."Account Type" = "Gen. Journal Line"."Account Type"::Vendor THEN BEGIN
+                                            GVRE_VendorBankAccount.RESET;
+                                            GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount.Code, "Gen. Journal Line"."Recipient Bank Account");
+                                            GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount."Vendor No.", "Gen. Journal Line"."Account No.");
+                                            IF GVRE_VendorBankAccount.FINDSET THEN BEGIN
+                                                GVTX_VendorName := GVRE_VendorBankAccount.Name;
+                                                ClrSysMmbIdBIC := GVRE_VendorBankAccount."SWIFT Code";
+                                            END ELSE BEGIN
+                                                MESSAGE(Text0001, "Gen. Journal Line"."Account No.", 'SWIFT Code');
+                                                ERROR('SWIFT Code');
                                             END;
-                                        end;
-                                    }
+                                        END;
+                                    end;
                                 }
+
                                 textelement(ClrSysMmbIdPstlAdr)
                                 {
                                     XmlName = 'PstlAdr';
@@ -614,6 +612,19 @@ xmlport 58160 BankXML_53_ROPT
 
                                 }
                             }
+                        }
+                        textelement(ChrgBr)
+                        {
+                            trigger OnBeforePassVariable()
+                            var
+                                chargeTypes: Enum "Charge Bearer";
+                            begin
+                                //ChrgBr := 'DEBT';
+                                if GVRE_VendorBankAccount.FindSet() then begin
+                                    chargeTypes := GVRE_VendorBankAccount."Charge Bearer";
+                                    ChrgBr := chargeTypes.Names.Get(chargeTypes.Ordinals.IndexOf(chargeTypes.AsInteger()));
+                                end;
+                            end;
                         }
                         textelement(Cdtr)
                         {

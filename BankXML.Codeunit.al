@@ -108,22 +108,23 @@ codeunit 58150 BankXML
                     GVBO_IsExported := XMLPORT.EXPORT(XMLPORT::BankXML_53_ROPT, GVOS_OutputStream);
                     TempBlob.CreateInStream(GVOS_InputStream);
                     // CopyStream(GVOS_OutputStream, GVOS_InputStream);
-                    // DownloadFromStream(GVOS_InputStream, 'Export CITI XML', '', '', GVTX_XMLName);
-                    base64string := base64Convert.ToBase64(GVOS_InputStream);
-                    jsonBody := ' {"base64":"' + base64string + '","fileName":"' + GVTX_XMLName + '","fileType":"text/xml", "fileExt":"TXT"}';
-                    httpContent.WriteFrom(jsonBody);
-                    httpContent.GetHeaders(httpHeader);
-                    httpHeader.Remove('Content-Type');
-                    httpHeader.Add('Content-Type', 'application/json');
+                    DownloadFromStream(GVOS_InputStream, 'Export CITI XML', '', '', GVTX_XMLName);
 
-                    httpClient.Post('https://bulk53sp.azurewebsites.net/api/bulk53sp', httpContent, httpResponse);
-                    httpResponse.Content().ReadAs(respText);
+                    // base64string := base64Convert.ToBase64(GVOS_InputStream);
+                    // jsonBody := ' {"base64":"' + base64string + '","fileName":"' + GVTX_XMLName + '","fileType":"text/xml", "fileExt":"TXT"}';
+                    // httpContent.WriteFrom(jsonBody);
+                    // httpContent.GetHeaders(httpHeader);
+                    // httpHeader.Remove('Content-Type');
+                    // httpHeader.Add('Content-Type', 'application/json');
 
-                    if httpResponse.HttpStatusCode = 200 then begin
-                        Message('アップロードが完了しました。The upload is complete.!');
-                    end else begin
-                        Error('Error :: %1', respText);
-                    end;
+                    // httpClient.Post('https://bulk53sp.azurewebsites.net/api/bulk53sp', httpContent, httpResponse);
+                    // httpResponse.Content().ReadAs(respText);
+
+                    // if httpResponse.HttpStatusCode = 200 then begin
+                    //     Message('アップロードが完了しました。The upload is complete.!');
+                    // end else begin
+                    //     Error('Error :: %1', respText);
+                    // end;
 
 
                     IF GVBO_IsExported THEN BEGIN

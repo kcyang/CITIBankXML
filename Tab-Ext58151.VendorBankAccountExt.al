@@ -12,5 +12,10 @@ tableextension 58151 VendorBankAccountExt extends "Vendor Bank Account"
             Caption = 'Bank Transfer Type';
             DataClassification = CustomerContent;
         }
+        field(58152; "Charge Bearer"; Enum "Charge Bearer")
+        {
+            Caption = 'Charge Bearer';
+            DataClassification = CustomerContent;
+        }
     }
 }
