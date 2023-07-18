@@ -613,19 +613,20 @@ xmlport 58160 BankXML_53_ROPT
                                 }
                             }
                         }
-                        textelement(ChrgBr)
-                        {
-                            trigger OnBeforePassVariable()
-                            var
-                                chargeTypes: Enum "Charge Bearer";
-                            begin
-                                //ChrgBr := 'DEBT';
-                                if GVRE_VendorBankAccount.FindSet() then begin
-                                    chargeTypes := GVRE_VendorBankAccount."Charge Bearer";
-                                    ChrgBr := chargeTypes.Names.Get(chargeTypes.Ordinals.IndexOf(chargeTypes.AsInteger()));
-                                end;
-                            end;
-                        }
+                        // ChrgBr tag is not available in International transfer.
+                        // textelement(ChrgBr)
+                        // {
+                        //     trigger OnBeforePassVariable()
+                        //     var
+                        //         chargeTypes: Enum "Charge Bearer";
+                        //     begin
+                        //         //ChrgBr := 'DEBT';
+                        //         if GVRE_VendorBankAccount.FindSet() then begin
+                        //             chargeTypes := GVRE_VendorBankAccount."Charge Bearer";
+                        //             ChrgBr := chargeTypes.Names.Get(chargeTypes.Ordinals.IndexOf(chargeTypes.AsInteger()));
+                        //         end;
+                        //     end;
+                        // }
                         textelement(Cdtr)
                         {
                             textelement("<nm3>")
@@ -671,7 +672,10 @@ xmlport 58160 BankXML_53_ROPT
                                         trigger OnBeforePassVariable()
                                         begin
                                             IF GVRE_VendorBankAccount.FINDSET THEN BEGIN
-                                                "<Id4>" := GVRE_VendorBankAccount."Bank Account No.";
+                                                if GVRE_VendorBankAccount.IBAN <> '' then
+                                                    "<id4>" := GVRE_VendorBankAccount.IBAN
+                                                else
+                                                    "<Id4>" := GVRE_VendorBankAccount."Bank Account No.";
                                             END ELSE BEGIN
                                                 MESSAGE(Text0001, GVRE_VendorBankAccount."Vendor No.", 'Bank Account No.');
                                                 ERROR('Bank Account No.');
@@ -706,6 +710,49 @@ xmlport 58160 BankXML_53_ROPT
                             //         end;
                             //     }
                             // }
+                        }
+                        textelement(InstrForCdtrAgt)
+                        {
+                            textelement(InstrInf)
+                            {
+                                trigger OnBeforePassVariable()
+                                begin
+                                    InstrInf := '/REC/NRT';
+                                end;
+                            }
+                        }
+                        textelement(RgltryRptg)
+                        {
+                            textelement(RgltryRptgDtls)
+                            {
+                                XmlName = 'Dtls';
+                                textelement(RgltryRptgDtlsInf)
+                                {
+                                    XmlName = 'Inf';
+                                    trigger OnBeforePassVariable()
+                                    var
+                                        resultTxt: Text;
+                                        resultCode: Text;
+                                        DimSetEntry: Record "Dimension Set Entry";
+                                    begin
+                                        Clear(resultTxt);
+                                        resultTxt := '/MOF/' + GVRE_VendorBankAccount."Country/Region Code" + ' ';
+                                        if "Gen. Journal Line"."Dimension Set ID" <> 0 then begin
+                                            DimSetEntry.SetRange("Dimension Set ID", "Gen. Journal Line"."Dimension Set ID");
+                                            DimSetEntry.SetFilter("Dimension Code", '%1', 'TRX PURPOSE');
+                                            if DimSetEntry.FindSet() then
+                                                resultCode := DimSetEntry."Dimension Value Code"
+                                            else
+                                                Error('You have not defined a value for the Transaction Purpose. Open the Line-Dimension, and define a value.');
+                                        end else
+                                            Error('You have not defined a value for the Dimension. Open the Dimension, and define a value.');
+
+                                        resultTxt += resultCode;
+
+                                        RgltryRptgDtlsInf := resultTxt;
+                                    end;
+                                }
+                            }
                         }
 
                         textelement(Purp)
