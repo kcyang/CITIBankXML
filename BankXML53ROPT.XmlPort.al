@@ -662,54 +662,45 @@ xmlport 58160 BankXML_53_ROPT
                             textelement("<id3>")
                             {
                                 XmlName = 'Id';
-                                textelement("<othr2>")
-                                {
-                                    XmlName = 'Othr';
-                                    textelement("<id4>")
-                                    {
-                                        XmlName = 'Id';
 
-                                        trigger OnBeforePassVariable()
-                                        begin
-                                            IF GVRE_VendorBankAccount.FINDSET THEN BEGIN
-                                                if GVRE_VendorBankAccount.IBAN <> '' then
-                                                    "<id4>" := GVRE_VendorBankAccount.IBAN
-                                                else
-                                                    "<Id4>" := GVRE_VendorBankAccount."Bank Account No.";
-                                            END ELSE BEGIN
-                                                MESSAGE(Text0001, GVRE_VendorBankAccount."Vendor No.", 'Bank Account No.');
-                                                ERROR('Bank Account No.');
-                                            END;
+                                textelement("IBAN")
+                                {
+                                    trigger OnBeforePassVariable()
+                                    begin
+                                        IF GVRE_VendorBankAccount.FindSet() then begin
+                                            if GVRE_VendorBankAccount.IBAN <> '' then
+                                                IBAN := GVRE_VendorBankAccount.IBAN
+                                            else
+                                                IBAN := '';
+                                        end else begin
+                                            MESSAGE(Text0001, GVRE_VendorBankAccount."Vendor No.", 'Bank Account No.');
+                                            ERROR('Bank Account No.');
                                         end;
-                                    }
+                                    end;
                                 }
                             }
-
-                            // textelement(Tp)
+                            // textelement("<othr2>")
                             // {
-                            //     textelement(Prtry)
+                            //     XmlName = 'Othr';
+                            //     textelement("<id4>")
                             //     {
+                            //         XmlName = 'Id';
+
                             //         trigger OnBeforePassVariable()
-                            //         var
-                            //             BankAccountType: Enum "Bank Account Type";
                             //         begin
-                            //             IF GVRE_VendorBankAccount.FindSet() THEN begin
-                            //                 Case GVRE_VendorBankAccount."Bank Account Type" of
-                            //                     BankAccountType::" ":
-                            //                         Prtry := 'SO';
-                            //                     BankAccountType::FUTSUU:
-                            //                         Prtry := 'FU';
-                            //                     BankAccountType::SONOTA:
-                            //                         Prtry := 'SO';
-                            //                     BankAccountType::CHOCHIKU:
-                            //                         Prtry := 'TI';
-                            //                     BankAccountType::TOUZA:
-                            //                         Prtry := 'TO';
-                            //                 End;
-                            //             end;
+                            //             IF GVRE_VendorBankAccount.FINDSET THEN BEGIN
+                            //                 if GVRE_VendorBankAccount.IBAN <> '' then
+                            //                     "<id4>" := GVRE_VendorBankAccount.IBAN
+                            //                 else
+                            //                     "<Id4>" := GVRE_VendorBankAccount."Bank Account No.";
+                            //             END ELSE BEGIN
+                            //                 MESSAGE(Text0001, GVRE_VendorBankAccount."Vendor No.", 'Bank Account No.');
+                            //                 ERROR('Bank Account No.');
+                            //             END;
                             //         end;
                             //     }
                             // }
+
                         }
                         textelement(InstrForCdtrAgt)
                         {
@@ -718,6 +709,18 @@ xmlport 58160 BankXML_53_ROPT
                                 trigger OnBeforePassVariable()
                                 begin
                                     InstrInf := '/REC/NRT';
+                                end;
+                            }
+                        }
+                        textelement(Purp)
+                        {
+                            textelement(PurpPrtry)
+                            {
+                                XmlName = 'Prtry';
+
+                                trigger OnBeforePassVariable()
+                                begin
+                                    PurpPrtry := '21';
                                 end;
                             }
                         }
@@ -755,18 +758,7 @@ xmlport 58160 BankXML_53_ROPT
                             }
                         }
 
-                        textelement(Purp)
-                        {
-                            textelement(PurpPrtry)
-                            {
-                                XmlName = 'Prtry';
 
-                                trigger OnBeforePassVariable()
-                                begin
-                                    PurpPrtry := '21';
-                                end;
-                            }
-                        }
                     }
                 }
             }
