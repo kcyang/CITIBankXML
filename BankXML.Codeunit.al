@@ -47,7 +47,7 @@ codeunit 58150 BankXML
                     END;
 
                     GVTX_XMLName := 'GUERBET.NC4.IMPORT_ACK.JP1' + FORMAT(TODAY, 0, '<Year,2><Month,2><Day,2>') + DELCHR(FORMAT(TIME, 4, '<Hours24><Minutes,2><Seconds,2>'), '=', ':') + '57' +
-                              '.PY_BULK.' + '53_ROPE' + '.NULL.NULL.TXT';
+                              '.PY_BULK.' + '53OPE' + '.NULL.NULL.TXT';
                     TempBlob.CreateOutStream(GVOS_OutputStream);
                     GVBO_IsExported := XMLPORT.EXPORT(XMLPORT::BankXML_53_ROPE, GVOS_OutputStream);
                     TempBlob.CreateInStream(GVOS_InputStream);
@@ -103,7 +103,7 @@ codeunit 58150 BankXML
                         ERROR('No lines to export');
                     END;
                     GVTX_XMLName := 'GUERBET.NC4.IMPORT_ACK.JP1' + FORMAT(TODAY, 0, '<Year,2><Month,2><Day,2>') + DELCHR(FORMAT(TIME, 4, '<Hours24><Minutes,2><Seconds,2>'), '=', ':') + '57' +
-                              '.PY_BULK.' + '53_ROPT' + '.NULL.NULL.TXT';
+                              '.PY_BULK.' + '53OPT' + '.NULL.NULL.TXT';
                     TempBlob.CreateOutStream(GVOS_OutputStream);
                     GVBO_IsExported := XMLPORT.EXPORT(XMLPORT::BankXML_53_ROPT, GVOS_OutputStream);
                     TempBlob.CreateInStream(GVOS_InputStream);
