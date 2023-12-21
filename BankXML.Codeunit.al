@@ -22,6 +22,7 @@ codeunit 58150 BankXML
         httpRequest: HttpRequestMessage;
         httpHeader: HttpHeaders;
         respText: Text;
+        GVRE_VendorBankAccount: Record "Vendor Bank Account";
 
 
     procedure GVFN_ExportData(var PAR_Options: Integer)
@@ -105,9 +106,25 @@ codeunit 58150 BankXML
                     GVTX_XMLName := 'GUERBET.NC4.IMPORT_ACK.JP1' + FORMAT(TODAY, 0, '<Year,2><Month,2><Day,2>') + DELCHR(FORMAT(TIME, 4, '<Hours24><Minutes,2><Seconds,2>'), '=', ':') + '57' +
                               '.PY_BULK.' + '53OPT' + '.NULL.NULL.TXT';
                     TempBlob.CreateOutStream(GVOS_OutputStream);
-                    GVBO_IsExported := XMLPORT.EXPORT(XMLPORT::BankXML_53_ROPT, GVOS_OutputStream);
+                    /*
+                    * If there is IBAN code in bank account vs. others.
+                    */
+                    IF GVRE_GenJournalLine."Account Type" = GVRE_GenJournalLine."Account Type"::Vendor THEN BEGIN
+                        GVRE_VendorBankAccount.RESET;
+                        GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount.Code, GVRE_GenJournalLine."Recipient Bank Account");
+                        GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount."Vendor No.", GVRE_GenJournalLine."Account No.");
+                        IF GVRE_VendorBankAccount.FINDSET THEN BEGIN
+                            if GVRE_VendorBankAccount.IBAN <> '' then begin
+                                GVBO_IsExported := XMLPORT.EXPORT(XMLPORT::BankXML_53_ROPT, GVOS_OutputStream);
+                            end else begin
+                                GVBO_IsExported := XMLPORT.EXPORT(XMLPORT::BankXML_53_ROPT_OTHER, GVOS_OutputStream);
+                            end;
+                        END ELSE BEGIN
+                            ERROR('Bank Account');
+                        END;
+                    END;
                     TempBlob.CreateInStream(GVOS_InputStream);
-                    // CopyStream(GVOS_OutputStream, GVOS_InputStream);
+                    //for Text download
                     //DownloadFromStream(GVOS_InputStream, 'Export CITI XML', '', '', GVTX_XMLName);
 
                     base64string := base64Convert.ToBase64(GVOS_InputStream);
@@ -125,7 +142,6 @@ codeunit 58150 BankXML
                     end else begin
                         Error('Error :: %1', respText);
                     end;
-
 
                     IF GVBO_IsExported THEN BEGIN
                         GVRE_XMLInterfaceLog.INIT;
