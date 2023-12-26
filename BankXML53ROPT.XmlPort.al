@@ -304,20 +304,6 @@ xmlport 58160 BankXML_53_ROPT
                                 }
                             }
                         }
-                        // ChrgBr tag is not available in International transfer.
-                        // textelement(ChrgBr)
-                        // {
-                        //     trigger OnBeforePassVariable()
-                        //     var
-                        //         chargeTypes: Enum "Charge Bearer";
-                        //     begin
-                        //         //ChrgBr := 'DEBT';
-                        //         if GVRE_VendorBankAccount.FindSet() then begin
-                        //             chargeTypes := GVRE_VendorBankAccount."Charge Bearer";
-                        //             ChrgBr := chargeTypes.Names.Get(chargeTypes.Ordinals.IndexOf(chargeTypes.AsInteger()));
-                        //         end;
-                        //     end;
-                        // }
                         textelement(Cdtr)
                         {
                             textelement("<nm3>")
@@ -362,11 +348,41 @@ xmlport 58160 BankXML_53_ROPT
                                             if GVRE_VendorBankAccount.IBAN <> '' then
                                                 IBAN := GVRE_VendorBankAccount.IBAN
                                             else
-                                                IBAN := '';
+                                                currXMLport.Skip();
+
                                         end else begin
                                             MESSAGE(Text0001, GVRE_VendorBankAccount."Vendor No.", 'Bank Account No.');
                                             ERROR('Bank Account No.');
                                         end;
+                                    end;
+                                }
+                                textelement("Othr3")
+                                {
+                                    XmlName = 'Othr';
+                                    textelement("<id4>")
+                                    {
+                                        XmlName = 'Id';
+                                        trigger OnBeforePassVariable()
+                                        begin
+                                            IF GVRE_VendorBankAccount.FindSet() then begin
+                                                if GVRE_VendorBankAccount.IBAN <> '' then
+                                                    "<id4>" := GVRE_VendorBankAccount.IBAN
+                                                else
+                                                    "<id4>" := GVRE_VendorBankAccount."Bank Account No.";
+                                            end else begin
+                                                MESSAGE(Text0001, GVRE_VendorBankAccount."Vendor No.", 'Bank Account No.');
+                                                ERROR('Bank Account No.');
+                                            end;
+                                        end;
+
+                                    }
+
+                                    trigger OnBeforePassVariable()
+                                    begin
+                                        IF GVRE_VendorBankAccount.FindSet() then begin
+                                            if GVRE_VendorBankAccount.IBAN <> '' then
+                                                currXMLport.Skip();
+                                        end
                                     end;
                                 }
                             }

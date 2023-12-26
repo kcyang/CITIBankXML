@@ -106,9 +106,12 @@ codeunit 58150 BankXML
                     GVTX_XMLName := 'GUERBET.NC4.IMPORT_ACK.JP1' + FORMAT(TODAY, 0, '<Year,2><Month,2><Day,2>') + DELCHR(FORMAT(TIME, 4, '<Hours24><Minutes,2><Seconds,2>'), '=', ':') + '57' +
                               '.PY_BULK.' + '53OPT' + '.NULL.NULL.TXT';
                     TempBlob.CreateOutStream(GVOS_OutputStream);
+
+                    GVBO_IsExported := XMLPORT.EXPORT(XMLPORT::BankXML_53_ROPT, GVOS_OutputStream);
                     /*
                     * If there is IBAN code in bank account vs. others.
                     */
+                    /*
                     IF GVRE_GenJournalLine."Account Type" = GVRE_GenJournalLine."Account Type"::Vendor THEN BEGIN
                         GVRE_VendorBankAccount.RESET;
                         GVRE_VendorBankAccount.SETFILTER(GVRE_VendorBankAccount.Code, GVRE_GenJournalLine."Recipient Bank Account");
@@ -123,6 +126,7 @@ codeunit 58150 BankXML
                             ERROR('Bank Account');
                         END;
                     END;
+                    */
                     TempBlob.CreateInStream(GVOS_InputStream);
                     //for Text download
                     //DownloadFromStream(GVOS_InputStream, 'Export CITI XML', '', '', GVTX_XMLName);
