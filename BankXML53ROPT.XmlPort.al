@@ -494,7 +494,7 @@ xmlport 58160 BankXML_53_ROPT
         GVRE_BankAccount: Record "Bank Account";
         GVRE_VendorBankAccount: Record "Vendor Bank Account";
         Text0001: Label '%1 ''s bank %2 doesn''t exist.';
-        GVIN_CtrlSum: Integer;
+        GVIN_CtrlSum: Decimal;
 
 }
 

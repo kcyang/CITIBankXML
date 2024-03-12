@@ -128,8 +128,9 @@ codeunit 58150 BankXML
                     END;
                     */
                     TempBlob.CreateInStream(GVOS_InputStream);
-                    //for Text download
-                    //DownloadFromStream(GVOS_InputStream, 'Export CITI XML', '', '', GVTX_XMLName);
+                    //for Text download test - start
+                    //DownloadFromStream(GVOS_InputStream, 'Export CITI XML', '', '', GVTX_XMLName); //####### TEST.....
+                    //for Text download test - end
 
                     base64string := base64Convert.ToBase64(GVOS_InputStream);
                     jsonBody := ' {"base64":"' + base64string + '","fileName":"' + GVTX_XMLName + '","fileType":"text/xml", "fileExt":"TXT"}';
