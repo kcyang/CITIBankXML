@@ -47,7 +47,7 @@ xmlport 58160 BankXML_53_ROPT
                                 REPEAT
                                     GVIN_CtrlSum += "Gen. Journal Line".Amount;
                                 UNTIL "Gen. Journal Line".NEXT = 0;
-                                CtrlSum := DELCHR(FORMAT(GVIN_CtrlSum), '=', ',');
+                                CtrlSum := DELCHR(FORMAT(GVIN_CtrlSum, 0, '<Precision,2:2><Standard Format,0>'), '=', ',');
                             END;
                         end;
                     }

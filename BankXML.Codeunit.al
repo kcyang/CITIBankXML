@@ -53,9 +53,9 @@ codeunit 58150 BankXML
                     GVBO_IsExported := XMLPORT.EXPORT(XMLPORT::BankXML_53_ROPE, GVOS_OutputStream);
                     TempBlob.CreateInStream(GVOS_InputStream);
                     //파일로 내려받는 부분 삭제.START
-                    //CopyStream(GVOS_OutputStream, GVOS_InputStream);
                     //DownloadFromStream(GVOS_InputStream, 'Export CITI XML', '', '', GVTX_XMLName);
                     //파일로 내려받는 부분 삭제.END
+                    //FTP Upload - START
                     base64string := base64Convert.ToBase64(GVOS_InputStream);
                     jsonBody := ' {"base64":"' + base64string + '","fileName":"' + GVTX_XMLName + '","fileType":"text/xml", "fileExt":"TXT"}';
                     httpContent.WriteFrom(jsonBody);
@@ -71,7 +71,7 @@ codeunit 58150 BankXML
                     end else begin
                         Error('Error :: %1', respText);
                     end;
-
+                    //FTP Upload - END.
                     IF GVBO_IsExported THEN BEGIN
                         GVRE_XMLInterfaceLog.INIT;
                         GVRE_XMLInterfaceLog."Extract Date" := WORKDATE;
@@ -128,10 +128,11 @@ codeunit 58150 BankXML
                     END;
                     */
                     TempBlob.CreateInStream(GVOS_InputStream);
-                    // //for Text download test - start
-                    // DownloadFromStream(GVOS_InputStream, 'Export CITI XML', '', '', GVTX_XMLName); //####### TEST.....
-                    // //for Text download test - end
+                    //for Text download test - start
+                    //DownloadFromStream(GVOS_InputStream, 'Export CITI XML', '', '', GVTX_XMLName); //####### TEST.....
+                    //for Text download test - end
 
+                    //FTP Upload - START
                     base64string := base64Convert.ToBase64(GVOS_InputStream);
                     jsonBody := ' {"base64":"' + base64string + '","fileName":"' + GVTX_XMLName + '","fileType":"text/xml", "fileExt":"TXT"}';
                     httpContent.WriteFrom(jsonBody);
@@ -147,6 +148,7 @@ codeunit 58150 BankXML
                     end else begin
                         Error('Error :: %1', respText);
                     end;
+                    //FTP Upload - END
 
                     IF GVBO_IsExported THEN BEGIN
                         GVRE_XMLInterfaceLog.INIT;
